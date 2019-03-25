@@ -6,21 +6,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BridgeAppApplication implements CommandLineRunner {
-
-
-	@Autowired
-	private MongoRepo repo;
+public class BridgeAppApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BridgeAppApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		repo.save(new Test("Test bridge app"));
-
-		System.out.println(repo.findAll());
-	}
 
 }
