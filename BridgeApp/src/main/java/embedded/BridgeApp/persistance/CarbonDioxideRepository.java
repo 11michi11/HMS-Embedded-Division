@@ -1,9 +1,9 @@
 package embedded.BridgeApp.persistance;
 
-import embedded.BridgeApp.application.data.TemperatureData;
+import embedded.BridgeApp.application.data.CarbonDioxideData;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TemperatureRepository extends MongoRepository<TemperatureData, String> {
+public interface CarbonDioxideRepository extends MongoRepository<CarbonDioxideData, String> {
 }

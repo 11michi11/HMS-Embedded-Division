@@ -1,10 +1,11 @@
 package embedded.BridgeApp.application.data;
 
 import embedded.BridgeApp.application.Visitor;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
+@Document(collection = "humidity")
 public class HumidityData extends Data {
 
     public HumidityData(LocalDateTime timeStamp, double data, String deviceId) {
@@ -13,6 +14,6 @@ public class HumidityData extends Data {
 
     @Override
     public void acceptVisitor(Visitor visitor) {
-        throw new NotImplementedException();
+        visitor.saveHumidity(this);
     }
 }
