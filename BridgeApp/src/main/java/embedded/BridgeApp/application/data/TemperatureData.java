@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class TemperatureData extends Data{
 
 
-    protected TemperatureData(LocalDateTime timeStamp, double data, String deviceId) {
+    public TemperatureData(LocalDateTime timeStamp, double data, String deviceId) {
         super(timeStamp, data, deviceId);
     }
 
@@ -17,4 +17,6 @@ public class TemperatureData extends Data{
     public void acceptVisitor(Visitor visitor) {
         visitor.saveTemperature(this);
     }
+
+
 }
