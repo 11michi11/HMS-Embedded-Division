@@ -1,4 +1,5 @@
 language: java
-      jdk: oraclejdk9
-      install: true
-      
+jdk: oraclejdk9
+install:
+script: 
+  - mvn -q -B -f BridgeApp/pom.xml clean verify test
