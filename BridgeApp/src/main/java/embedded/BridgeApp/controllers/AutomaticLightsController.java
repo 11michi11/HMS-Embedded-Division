@@ -12,13 +12,13 @@ public class AutomaticLightsController {
     private LightsControl controller;
 
     @PutMapping(path = "/{deviceID}")
-    public void turnOnMovement(@PathVariable int deviceID) {
+    public void turnOnMovementDetection(@PathVariable int deviceID) {
         System.out.println("Turn on movement on device: "+deviceID);
         controller.turnOnMovementDetection(deviceID);
     }
 
     @DeleteMapping(path = "/{deviceID}")
-    public void turnOffMovement(@PathVariable int deviceID) {
+    public void turnOffMovementDetection(@PathVariable int deviceID) {
         System.out.println("Turn off movement on device: "+deviceID);
         controller.turnOffMovementDetection(deviceID);
     }
