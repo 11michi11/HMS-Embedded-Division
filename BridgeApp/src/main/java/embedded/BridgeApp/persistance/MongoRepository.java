@@ -1,9 +1,12 @@
 package embedded.BridgeApp.persistance;
 
+import embedded.BridgeApp.application.Element;
 import embedded.BridgeApp.application.Visitor;
 import embedded.BridgeApp.application.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class MongoRepository implements Visitor {
@@ -26,6 +29,9 @@ public class MongoRepository implements Visitor {
         this.lightRepository = lightRepository;
     }
 
+    public void save(List<Element> elements) {
+        elements.forEach(element -> element.acceptVisitor(this));
+    }
 
     @Override
     public void saveCarbonDioxide(CarbonDioxideData data) {
