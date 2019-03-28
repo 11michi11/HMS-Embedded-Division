@@ -1,3 +1,5 @@
 language: java
 jdk: oraclejdk9
-install: true
+install:
+script: 
+  - mvn -q -B -f pom.xml clean verify test
