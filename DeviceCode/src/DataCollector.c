@@ -4,6 +4,7 @@
 
 #include "DataCollector.h"
 #include <util/delay.h>
+#include <EventReactor.h>
 
 //FIXME Define final ports
 
@@ -85,12 +86,16 @@ void gatherSound(){
 void monitorMovement(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
-    TickType_t xLastWakeTimeSound=xTaskGetTickCount();
+    TickType_t xLastWakeTimeMovement=xTaskGetTickCount();
     while(1){
-        xSemaphoreTake(*semaphore,SENSOR_TIMER*58);
+        xSemaphoreTake(*semaphore,SENSOR_TIMER);
         printf("MOVEMENT TASK \n");
+        //FIXME Remove the following 3 lines as it's simply for testing purposes
+        if(xLastWakeTimeMovement<50){
+            vTaskResume(eventReactorTask);
+        }
         xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeSound,SENSOR_TIMER);
+        vTaskDelayUntil(&xLastWakeTimeMovement,SENSOR_TIMER);
         //FIXME IMPLEMENT ME
     }
 #pragma clang diagnostic pop
