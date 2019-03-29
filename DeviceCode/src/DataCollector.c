@@ -19,8 +19,10 @@ static TaskHandle_t TempHandle=NULL;
 static TaskHandle_t SoundHandle=NULL;
 static TaskHandle_t MovementHandle=NULL;
 
+static TimerHandle_t sensorTimer;
 
 
+void sensorTimerCallback(TimerHandle_t pxTimer);
 
 void initializeDataCollector(sensor_data_t* sensorData, SemaphoreHandle_t* semaphoreHandle){
     sensorDataPrivate=sensorData;
@@ -31,6 +33,9 @@ void initializeDataCollector(sensor_data_t* sensorData, SemaphoreHandle_t* semap
     xTaskCreate(gatherSound,"SOUND_TASK",configMINIMAL_STACK_SIZE,NULL,REGULAR_SENSOR_TASK_PRIORITY,&SoundHandle);
     xTaskCreate(monitorMovement,"MOVEMENT_TASK",configMINIMAL_STACK_SIZE,NULL,MOVEMENT_SENSOR_TASK_PRIORITY,&MovementHandle);
 
+    sensorTimer=xTimerCreate("SENSOR_TIMER",pdMS_TO_TICKS(1000),pdTRUE,(void*)0,sensorTimerCallback);
+    xTimerStart(sensorTimer,0);
+
 }
 
 void gatherCO2(){
@@ -38,9 +43,9 @@ void gatherCO2(){
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     TickType_t xLastWakeTimeCO2=xTaskGetTickCount();
     while(1){
-        xSemaphoreTake(*semaphore,portMAX_DELAY);
+        xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
         //FIXME IMPLEMENT ME
-        printf("CO2 TASK \n");
+        printf("CO2 TASK %d \n",xLastWakeTimeCO2);
         xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeCO2,SENSOR_TIMER*60);
     }
@@ -53,7 +58,7 @@ void gatherTemp(){
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     TickType_t xLastWakeTimeTemp=xTaskGetTickCount();
     while(1){
-        xSemaphoreTake(*semaphore,portMAX_DELAY);
+        xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
         printf("TEMP TASK \n");
         xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeTemp,SENSOR_TIMER*60);
@@ -65,9 +70,9 @@ void gatherTemp(){
 void gatherSound(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+    TickType_t xLastWakeTimeSound=xTaskGetTickCount();
     while(1){
-        TickType_t xLastWakeTimeSound=xTaskGetTickCount();
-        xSemaphoreTake(*semaphore,portMAX_DELAY);
+        xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
         printf("SOUND TASK \n");
         //FIXME IMPLEMENT ME
         xSemaphoreGive(*semaphore);
@@ -80,9 +85,9 @@ void gatherSound(){
 void monitorMovement(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+    TickType_t xLastWakeTimeSound=xTaskGetTickCount();
     while(1){
-        TickType_t xLastWakeTimeSound=xTaskGetTickCount();
-        xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
+        xSemaphoreTake(*semaphore,SENSOR_TIMER*58);
         printf("MOVEMENT TASK \n");
         xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeSound,SENSOR_TIMER);
@@ -104,4 +109,8 @@ sensor_data_t* getSensorData(){
     }
 #pragma clang diagnostic pop
 
+}
+
+void sensorTimerCallback(TimerHandle_t pxTimer){
+    xSemaphoreGive(*semaphore);
 }
