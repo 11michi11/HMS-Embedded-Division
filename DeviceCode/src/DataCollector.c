@@ -3,17 +3,17 @@
 //
 
 #include "DataCollector.h"
+#include <util/delay.h>
 
 //FIXME Define final ports
 
 #define REGULAR_SENSOR_TASK_PRIORITY (tskIDLE_PRIORITY+1)
 #define MOVEMENT_SENSOR_TASK_PRIORITY (tskIDLE_PRIORITY)
-
+// ~1s
+int const SENSOR_TIMER=954/portTICK_PERIOD_MS;
 
 static sensor_data_t* sensorDataPrivate;
 static SemaphoreHandle_t* semaphore;
-
-
 static TaskHandle_t CO2Handle=NULL;
 static TaskHandle_t TempHandle=NULL;
 static TaskHandle_t SoundHandle=NULL;
@@ -22,7 +22,7 @@ static TaskHandle_t MovementHandle=NULL;
 
 
 
-void initializeDataColector(sensor_data_t* sensorData,SemaphoreHandle_t* semaphoreHandle) {
+void initializeDataCollector(sensor_data_t* sensorData, SemaphoreHandle_t* semaphoreHandle){
     sensorDataPrivate=sensorData;
     semaphore=semaphoreHandle;
 
@@ -42,7 +42,7 @@ void gatherCO2(){
         //FIXME IMPLEMENT ME
         printf("CO2 TASK \n");
         xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeCO2,2000);
+        vTaskDelayUntil(&xLastWakeTimeCO2,SENSOR_TIMER*60);
     }
 
 #pragma clang diagnostic pop
@@ -56,7 +56,7 @@ void gatherTemp(){
         xSemaphoreTake(*semaphore,portMAX_DELAY);
         printf("TEMP TASK \n");
         xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeTemp,2000);
+        vTaskDelayUntil(&xLastWakeTimeTemp,SENSOR_TIMER*60);
     }
 #pragma clang diagnostic pop
 
@@ -71,7 +71,7 @@ void gatherSound(){
         printf("SOUND TASK \n");
         //FIXME IMPLEMENT ME
         xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeSound,2000);
+        vTaskDelayUntil(&xLastWakeTimeSound,SENSOR_TIMER*60);
     }
 #pragma clang diagnostic pop
 
@@ -82,10 +82,10 @@ void monitorMovement(){
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     while(1){
         TickType_t xLastWakeTimeSound=xTaskGetTickCount();
-        xSemaphoreTake(*semaphore,portMAX_DELAY);
+        xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
         printf("MOVEMENT TASK \n");
         xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeSound,400);
+        vTaskDelayUntil(&xLastWakeTimeSound,SENSOR_TIMER);
         //FIXME IMPLEMENT ME
     }
 #pragma clang diagnostic pop
@@ -100,7 +100,7 @@ sensor_data_t* getSensorData(){
         xSemaphoreTake(*semaphore,portMAX_DELAY);
         printf("SENSOR DATA GATHERED \n");
         xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeSound,2000);
+        vTaskDelayUntil(&xLastWakeTimeSound,SENSOR_TIMER*61);
     }
 #pragma clang diagnostic pop
 

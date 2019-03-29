@@ -28,7 +28,7 @@ typedef struct sensor_data{
     uint8_t movement;
 }sensor_data_t;
 
-void initialize(sensor_data_t* sensorData, SemaphoreHandle_t* semaphoreHandle);
+void initializeDataCollector(sensor_data_t* sensorData, SemaphoreHandle_t* semaphoreHandle);
 void gatherCO2();
 void gatherTemp();
 void gatherSound();

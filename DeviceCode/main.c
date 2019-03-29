@@ -16,7 +16,7 @@ int main() {
     sensor_data_t* sensorData=(sensor_data_t*)malloc(sizeof(sensor_data_t));
     preferences_t* preferences=(preferences_t*)malloc(sizeof(preferences_t));
     semaphoreHandle= xSemaphoreCreateMutex();
-    initialize(sensorData,&semaphoreHandle);
+    initializeDataCollector(sensorData,&semaphoreHandle);
     initializeHelper(sensorData,&semaphoreHandle,preferences);
     vTaskStartScheduler();
     return 0;
