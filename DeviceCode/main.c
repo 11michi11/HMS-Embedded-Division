@@ -1,6 +1,23 @@
+#include <ATMEGA_FreeRTOS.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <DataCollector.h>
+#include <EventReactor.h>
+#include <LoraHelper.h>
+#include <interrupt.h>
+#include <stdio_driver.h>
+
+SemaphoreHandle_t semaphoreHandle;
+
 
 int main() {
-    printf("Hello, World!\n");
+    stdioCreate(0);
+    sei();
+    sensor_data_t* sensorData=(sensor_data_t*)malloc(sizeof(sensor_data_t));
+    preferences_t* preferences=(preferences_t*)malloc(sizeof(preferences_t));
+    semaphoreHandle= xSemaphoreCreateMutex();
+    initialize(sensorData,&semaphoreHandle);
+    initializeHelper(sensorData,&semaphoreHandle,preferences);
+    vTaskStartScheduler();
     return 0;
 }

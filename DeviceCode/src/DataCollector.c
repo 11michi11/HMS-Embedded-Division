@@ -31,24 +31,32 @@ void initializeDataColector(sensor_data_t* sensorData,SemaphoreHandle_t* semapho
     xTaskCreate(gatherSound,"SOUND_TASK",configMINIMAL_STACK_SIZE,NULL,REGULAR_SENSOR_TASK_PRIORITY,&SoundHandle);
     xTaskCreate(monitorMovement,"MOVEMENT_TASK",configMINIMAL_STACK_SIZE,NULL,MOVEMENT_SENSOR_TASK_PRIORITY,&MovementHandle);
 
-    xTimerCreate()
 }
 
 void gatherCO2(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+    TickType_t xLastWakeTimeCO2=xTaskGetTickCount();
     while(1){
+        xSemaphoreTake(*semaphore,portMAX_DELAY);
         //FIXME IMPLEMENT ME
-        printf("CO2 TASK");
+        printf("CO2 TASK \n");
+        xSemaphoreGive(*semaphore);
+        vTaskDelayUntil(&xLastWakeTimeCO2,2000);
     }
+
 #pragma clang diagnostic pop
 }
 
 void gatherTemp(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+    TickType_t xLastWakeTimeTemp=xTaskGetTickCount();
     while(1){
-        printf("TEMP TASK");
+        xSemaphoreTake(*semaphore,portMAX_DELAY);
+        printf("TEMP TASK \n");
+        xSemaphoreGive(*semaphore);
+        vTaskDelayUntil(&xLastWakeTimeTemp,2000);
     }
 #pragma clang diagnostic pop
 
@@ -58,8 +66,12 @@ void gatherSound(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     while(1){
-        printf("SOUND TASK");
+        TickType_t xLastWakeTimeSound=xTaskGetTickCount();
+        xSemaphoreTake(*semaphore,portMAX_DELAY);
+        printf("SOUND TASK \n");
         //FIXME IMPLEMENT ME
+        xSemaphoreGive(*semaphore);
+        vTaskDelayUntil(&xLastWakeTimeSound,2000);
     }
 #pragma clang diagnostic pop
 
@@ -69,7 +81,11 @@ void monitorMovement(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     while(1){
-        printf("MOVEMENT TASK");
+        TickType_t xLastWakeTimeSound=xTaskGetTickCount();
+        xSemaphoreTake(*semaphore,portMAX_DELAY);
+        printf("MOVEMENT TASK \n");
+        xSemaphoreGive(*semaphore);
+        vTaskDelayUntil(&xLastWakeTimeSound,400);
         //FIXME IMPLEMENT ME
     }
 #pragma clang diagnostic pop
@@ -80,7 +96,11 @@ sensor_data_t* getSensorData(){
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     while(1){
         //FIXME IMPLEMENT ME
-        printf("SENSOR DATA GATHERED");
+        TickType_t xLastWakeTimeSound=xTaskGetTickCount();
+        xSemaphoreTake(*semaphore,portMAX_DELAY);
+        printf("SENSOR DATA GATHERED \n");
+        xSemaphoreGive(*semaphore);
+        vTaskDelayUntil(&xLastWakeTimeSound,2000);
     }
 #pragma clang diagnostic pop
 
