@@ -57,6 +57,7 @@ void gatherCO2(){
 void gatherTemp(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
     TickType_t xLastWakeTimeTemp=xTaskGetTickCount();
     while(1){
         xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
@@ -71,6 +72,7 @@ void gatherTemp(){
 void gatherSound(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
     TickType_t xLastWakeTimeSound=xTaskGetTickCount();
     while(1){
         xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
@@ -86,6 +88,7 @@ void gatherSound(){
 void monitorMovement(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
     TickType_t xLastWakeTimeMovement=xTaskGetTickCount();
     while(1){
         xSemaphoreTake(*semaphore,SENSOR_TIMER);
@@ -99,8 +102,8 @@ void monitorMovement(){
         //FIXME IMPLEMENT ME
     }
 #pragma clang diagnostic pop
-
 }
+
 sensor_data_t* getSensorData(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"

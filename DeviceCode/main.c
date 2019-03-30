@@ -9,7 +9,6 @@
 
 SemaphoreHandle_t semaphoreHandle;
 
-
 int main() {
     stdioCreate(0);
     sei();
