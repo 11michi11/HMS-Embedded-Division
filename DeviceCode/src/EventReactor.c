@@ -6,7 +6,7 @@
 #define BUZZER_PORT (PB0)
 #define LIGHT_PORT (PB1)
 
-static const int LIGHT_DURATION_MS=30000;
+static const int LIGHT_DURATION_MS=(954/portTICK_PERIOD_MS)*30;
 static const int BUZZER_DURATION_MS=100;
 TaskHandle_t eventReactorTask=NULL;
 
@@ -17,10 +17,9 @@ void toggleLights(){
     while(1){
         //FIXME IMPLEMENT ME
             printf("PRE-DELAY-TOGGLE \n");
-            vTaskDelay(pdMS_TO_TICKS(30));
+            vTaskDelay(LIGHT_DURATION_MS);
             printf("POST-DELAY-TOGGLE \n");
             vTaskSuspend(eventReactorTask);
-            vTaskDelay(0);
           }
 #pragma clang diagnostic pop
 }
