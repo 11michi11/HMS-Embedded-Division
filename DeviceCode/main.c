@@ -14,6 +14,7 @@ int main() {
     sei();
     sensor_data_t* sensorData=(sensor_data_t*)malloc(sizeof(sensor_data_t));
     preferences_t* preferences=(preferences_t*)malloc(sizeof(preferences_t));
+    preferences->lightPreference=1;
     semaphoreHandle= xSemaphoreCreateMutex();
     initializeEventReactor(preferences);
     initializeDataCollector(sensorData,&semaphoreHandle);

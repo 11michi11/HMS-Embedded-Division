@@ -94,8 +94,10 @@ void monitorMovement(){
         xSemaphoreTake(*semaphore,SENSOR_TIMER);
         printf("MOVEMENT TASK \n");
         //FIXME Remove the following 3 lines as it's simply for testing purposes
-        if(xLastWakeTimeMovement<50){
+        if(PINA==1){
             vTaskResume(eventReactorTask);
+            xSemaphoreGive(*semaphore);
+            vTaskDelayUntil(&xLastWakeTimeMovement,SENSOR_TIMER*30);
         }
         xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeMovement,SENSOR_TIMER);
