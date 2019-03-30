@@ -1,6 +1,3 @@
-//
-// Created by PC on 3/29/2019.
-//
 
 #ifndef SEP4_DEVICE_CODE_EVENTREACTOR_H
 #define SEP4_DEVICE_CODE_EVENTREACTOR_H
@@ -22,5 +19,5 @@ typedef struct preferences{
 
 void toggleLights();
 void toggleBuzzer();
-
+void initializeEventReactor(preferences_t* preferences);
 #endif //SEP4_DEVICE_CODE_EVENTREACTOR_H

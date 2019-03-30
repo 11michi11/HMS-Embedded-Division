@@ -1,6 +1,3 @@
-//
-// Created by PC on 3/29/2019.
-//
 
 #include "LoraHelper.h"
 #include <DataCollector.h>

@@ -15,8 +15,7 @@ int main() {
     sensor_data_t* sensorData=(sensor_data_t*)malloc(sizeof(sensor_data_t));
     preferences_t* preferences=(preferences_t*)malloc(sizeof(preferences_t));
     semaphoreHandle= xSemaphoreCreateMutex();
-    xTaskCreate(toggleLights,"LIGHT_TOGGLE",configMINIMAL_STACK_SIZE,NULL,2,&eventReactorTask);
-    vTaskSuspend(eventReactorTask);
+    initializeEventReactor(preferences);
     initializeDataCollector(sensorData,&semaphoreHandle);
     initializeHelper(sensorData,&semaphoreHandle,preferences);
     vTaskStartScheduler();
