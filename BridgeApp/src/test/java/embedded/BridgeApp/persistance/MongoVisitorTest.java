@@ -9,7 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,6 +34,7 @@ public class MongoVisitorTest {
 
     @Autowired
     private MongoRepository mongoRepository;
+
 
     @Test
     void testVisitor() {
@@ -71,6 +74,7 @@ public class MongoVisitorTest {
         carbonDioxideRepository.delete(dataC);
         temperatureRepository.delete(dataT);
     }
+
 
 
 }

@@ -52,4 +52,8 @@ public abstract class Data implements Element {
                 ", data=" + data +
                 '}';
     }
+
+    public double getValue(){
+        return data;
+    }
 }

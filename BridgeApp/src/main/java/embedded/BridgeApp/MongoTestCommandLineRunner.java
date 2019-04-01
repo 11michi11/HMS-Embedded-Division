@@ -1,9 +1,17 @@
 package embedded.BridgeApp;
 
+import embedded.BridgeApp.application.Element;
+import embedded.BridgeApp.application.data.Data;
+import embedded.BridgeApp.application.data.TemperatureData;
 import embedded.BridgeApp.persistance.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 @Component
 public class MongoTestCommandLineRunner implements CommandLineRunner {
@@ -20,6 +28,9 @@ public class MongoTestCommandLineRunner implements CommandLineRunner {
     private MovementRepository movementRepository;
     @Autowired
     private LightRepository lightRepository;
+
+
+    static Random rn = new Random();
 
     @Override
     public void run(String... args) throws Exception {
@@ -47,6 +58,35 @@ public class MongoTestCommandLineRunner implements CommandLineRunner {
 //        carbonDioxideRepository.delete(dataC);
 //        temperatureRepository.delete(dataT);
 
+         //generateDummyTemperatureData(50).stream()
+//                 .map(data -> (TemperatureData) data)
+//                 .map(Data::getValue)
+//                 .forEach(System.out::println);
+
     }
+
+
+    List<Element> generateDummyTemperatureData(int amount) {
+        var elements = new LinkedList<Element>();
+
+        LocalDateTime time = LocalDateTime.now();
+        var value = 20.0;
+        var id = "TestDevice";
+
+        for (int i = 0; i < amount; i++) {
+            elements.add(new TemperatureData(time, value, id));
+            value = generateNewValue(value);
+            time = time.plusMinutes(5);
+        }
+        return elements;
+    }
+
+    static double generateNewValue(double value) {
+        int x = rn.nextInt(5);
+        if (rn.nextBoolean() && (value - x) > 0)
+            return value - x;
+        return value + x;
+    }
+
 
 }
