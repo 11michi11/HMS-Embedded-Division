@@ -11,9 +11,9 @@
 #define CO2_PORT PA3;
 #define TEMP_PORT PA2;
 #define SOUND_PORT PA1;
-#define PROXIMITY_PORT PA0;
+#define PROXIMITY_PIN PINA
 //FIXME Define final priority for sensors
-#define REGULAR_SENSOR_PRIORITY (IDLE)
+
 
 //FIXME TASK HANDLES FOR SENSOR DATA (Put em in .C maybe? fuck do I know ask Ib)
 
@@ -30,6 +30,5 @@ void gatherCO2();
 void gatherTemp();
 void gatherSound();
 void monitorMovement();
-sensor_data_t* getSensorData();
 
 #endif //SEP4_DEVICE_CODE_DATACOLLECTOR_H

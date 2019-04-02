@@ -94,31 +94,17 @@ void monitorMovement(){
         xSemaphoreTake(*semaphore,SENSOR_TIMER);
         printf("MOVEMENT TASK \n");
         //FIXME Remove the following 3 lines as it's simply for testing purposes
-        if(PINA==1){
+        if(PROXIMITY_PIN==1){
             vTaskResume(eventReactorTask);
             xSemaphoreGive(*semaphore);
-            vTaskDelayUntil(&xLastWakeTimeMovement,SENSOR_TIMER*30);
+            vTaskDelayUntil(&xLastWakeTimeMovement,SENSOR_TIMER*10);
+        } else{
+            xSemaphoreGive(*semaphore);
+            vTaskDelayUntil(&xLastWakeTimeMovement,SENSOR_TIMER*1);
         }
-        xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeMovement,SENSOR_TIMER);
         //FIXME IMPLEMENT ME
     }
 #pragma clang diagnostic pop
-}
-
-sensor_data_t* getSensorData(){
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-    while(1){
-        //FIXME IMPLEMENT ME
-        TickType_t xLastWakeTimeSound=xTaskGetTickCount();
-        xSemaphoreTake(*semaphore,portMAX_DELAY);
-        printf("SENSOR DATA GATHERED \n");
-        xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeSound,SENSOR_TIMER*61);
-    }
-#pragma clang diagnostic pop
-
 }
 
 void sensorTimerCallback(TimerHandle_t pxTimer){

@@ -3,7 +3,7 @@
 #define BUZZER_PORT (PB7)
 #define LIGHT_PORT (PB6)
 
-static const int LIGHT_DURATION_S=(954/portTICK_PERIOD_MS)*30;
+static const int LIGHT_DURATION_S=(954/portTICK_PERIOD_MS)*10;
 static const int BUZZER_DURATION_S=(954/portTICK_PERIOD_MS)*5;
 TaskHandle_t eventReactorTask=NULL;
 static preferences_t* privatePreferences;
