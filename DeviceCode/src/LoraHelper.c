@@ -1,6 +1,7 @@
 
 #include "LoraHelper.h"
 #include <DataCollector.h>
+
 #define LAURA_IO_TASK_PRIORITY (tskIDLE_PRIORITY+2)
 
 static preferences_t* privatePreferences;

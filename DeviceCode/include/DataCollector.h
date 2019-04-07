@@ -8,9 +8,6 @@
 #define SEP4_DEVICE_CODE_DATACOLLECTOR_H
 
 //FIXME Define final ports
-#define CO2_PORT PA3;
-#define TEMP_PORT PA2;
-#define SOUND_PORT PA1;
 #define PROXIMITY_PIN PINA
 //FIXME Define final priority for sensors
 
