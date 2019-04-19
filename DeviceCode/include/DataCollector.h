@@ -20,11 +20,12 @@ typedef struct sensor_data{
     uint8_t temperature;
     uint8_t sound;
     uint8_t movement;
+    uint8_t humidity;
 }sensor_data_t;
 
 void initializeDataCollector(sensor_data_t* sensorData, SemaphoreHandle_t* semaphoreHandle);
 void gatherCO2();
-void gatherTemp();
+void gatherTempAndHumidity();
 void gatherSound();
 void monitorMovement();
 
