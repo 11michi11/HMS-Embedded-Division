@@ -10,7 +10,7 @@ public class LoraTranslator {
 
     public static List<Element> translateDataFromDevice(String data, String eui) {
         byte[] dataArray = hexStringToByteArray(data);
-        return loadData(dataArray,deviceId);
+        return loadData(dataArray,eui);
     }
 
     public static String translateOperationCodeToData(OperationCode code, int deviceID){
