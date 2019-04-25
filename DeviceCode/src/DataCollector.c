@@ -47,7 +47,7 @@ void initialize_data_collector(sensor_data_t *sensorData, SemaphoreHandle_t *sem
     xTaskCreate(gather_co2, "CO2_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY, &CO2Handle);
     xTaskCreate(gather_temp_and_humidity, "TEMP_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY,
                 &TempHandle);
-    xTaskCreate(gatherSound,"SOUND_TASK",configMINIMAL_STACK_SIZE,NULL,REGULAR_SENSOR_TASK_PRIORITY,&SoundHandle);
+    xTaskCreate(gather_sound,"SOUND_TASK",configMINIMAL_STACK_SIZE,NULL,REGULAR_SENSOR_TASK_PRIORITY,&SoundHandle);
     xTaskCreate(monitor_movement, "MOVEMENT_TASK", configMINIMAL_STACK_SIZE, NULL, MOVEMENT_SENSOR_TASK_PRIORITY,
                 &MovementHandle);
     //FIXME Still need to figure out where to use this one.
@@ -58,7 +58,7 @@ void initialize_data_collector(sensor_data_t *sensorData, SemaphoreHandle_t *sem
     hcSr501Inst = hcSr501Create(&PORTE, PE5);
     if ( NULL != hcSr501Inst )
     {
-        printf("DRIVER_INITIALIZED");
+        printf("DRIVER_INITIALIZED \n");
     }
     //--------------------------------------------- CO_2 SENSOR SETUP --------------------------------------------------//
     mh_z19_create(ser_USART3, co2_callback);
@@ -104,7 +104,7 @@ void gather_temp_and_humidity(){
 
         hih8120Meassure();
         vTaskDelayUntil(&xLastWakeTimeTemp,pdMS_TO_TICKS(51));
-        
+   
         sensorDataPrivate->temperature+=hih8120GetTemperature_x10()/10;
         sensorDataPrivate->humidity+=hih8120GetHumidityPercent_x10()/10;
 

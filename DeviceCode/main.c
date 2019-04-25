@@ -24,8 +24,9 @@ int main() {
     semaphoreHandle= xSemaphoreCreateMutex();
     initializeEventReactor(preferences);
     initialize_data_collector(sensorData, &semaphoreHandle);
-//    initializeHelper(sensorData,&semaphoreHandle,preferences);
+	initialize_lora_helper(sensorData,&semaphoreHandle,preferences);
     vTaskStartScheduler();
-
+	while(1){
+	}
     return 0;
 }
