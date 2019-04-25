@@ -1,8 +1,20 @@
-
 #include "LoraHelper.h"
 #include <DataCollector.h>
+#include <ihal.h>
+#include <lora_driver.h>
+#include <util/delay.h>
 
 #define LAURA_IO_TASK_PRIORITY (tskIDLE_PRIORITY+2)
+
+#define LORA_appEUI "E81068FC10812076"
+#define LORA_appKEY "3894B87078D8A38B56E419ABCA16043E"
+
+#define CO2_PAYLOAD_INDEX 0
+#define TEMP_PAYLOAD_INDEX 1
+#define HUMIDITY_PAYLOAD_INDEX 2
+#define SOUND_PAYLOAD_INDEX 3
+#define MOVEMENT_PAYLOAD_INDEX 4
+#define LIGHT_PAYLOAD_INDEX 5
 
 static preferences_t* privatePreferences;
 static SemaphoreHandle_t* privateSemaphore;
@@ -15,14 +27,16 @@ static TimerHandle_t lauraTimer;
 static const int IO_DELAY = (954/portTICK_PERIOD_MS)*300;
 
 void lauraTimerCallback(TimerHandle_t pxTimer);
-
+void laura_setup();
 
 void initializeHelper(sensor_data_t* sensorData, SemaphoreHandle_t* semaphoreHandle,preferences_t* preferences){
     privatePreferences=preferences;
     privateSemaphore=semaphoreHandle;
     privateSensorData=sensorData;
+
     xTaskCreate(handleMessage,"MESSAGE_HANDLE",configMINIMAL_STACK_SIZE,NULL,LAURA_IO_TASK_PRIORITY,&ioTaskHandle);
-    lauraTimer=xTimerCreate("SENSOR_TIMER",pdMS_TO_TICKS(IO_DELAY),pdTRUE,(void*)0,lauraTimerCallback);
+    vTaskSuspend(ioTaskHandle);
+    lauraTimer=xTimerCreate("SENSOR_TIMER",IO_DELAY,pdFALSE,(void*)0,lauraTimerCallback);
     xTimerStart(lauraTimer,0);
 }
 
@@ -33,17 +47,63 @@ void handleMessage(){
     while(1){
         //FIXME IMPLEMENT ME
         xSemaphoreTake(*privateSemaphore,IO_DELAY);
-        printf("SENSOR_DATA_SEND_OFF %d\n",IO_DELAY);
+        lora_payload_t loraPayload;
+        loraPayload.len=6;
+        loraPayload.bytes[CO2_PAYLOAD_INDEX]=privateSensorData->CO2;
+        loraPayload.bytes[TEMP_PAYLOAD_INDEX]=privateSensorData->temperature;
+        loraPayload.bytes[HUMIDITY_PAYLOAD_INDEX]=privateSensorData->humidity;
+        loraPayload.bytes[MOVEMENT_PAYLOAD_INDEX]=privateSensorData->movement;
+        loraPayload.bytes[SOUND_PAYLOAD_INDEX]=privateSensorData->sound;
+        printf("%dc,%dt,%dh,%ds,%dm PRE-REMOVE \n",privateSensorData->CO2,privateSensorData->temperature,privateSensorData->humidity,privateSensorData->sound,privateSensorData->movement);
+        e_LoRa_return_code_t returnCode;
+        if ((returnCode = lora_driver_sent_upload_message(false, &loraPayload)) == LoRa_MAC_TX_OK )
+        {
+            printf("SENSOR_DATA_SEND_OFF %d\n",IO_DELAY);
+            // The uplink message is sent and there is no downlink message received
+        }
+        else if (returnCode == LoRa_MAC_RX_OK)
+        {
+            parseMessage();
+        }
+        privateSensorData->movement=0;
+        privateSensorData->sound=0;
+        privateSensorData->humidity=0;
+        privateSensorData->temperature=0;
+        privateSensorData->CO2=0;
+        printf("%dc,%dt,%dh,%ds,%dm POST-REMOVE",privateSensorData->CO2,privateSensorData->temperature,privateSensorData->humidity,privateSensorData->sound,privateSensorData->movement);
         xSemaphoreGive(*privateSemaphore);
         vTaskDelayUntil(&xLastWakeTimeLoraSendOff,IO_DELAY);
     }
 #pragma clang diagnostic pop
 }
-
+//TODO discuss what does the device get back
 void parseMessage(){
 
 }
 
 void lauraTimerCallback(TimerHandle_t pxTimer){
-    xSemaphoreGive(*privateSemaphore);
+    printf("TIMER_FIRE\n");
+    vTaskResume(ioTaskHandle);
+}
+void laura_setup(){
+    //FIXME
+    lora_driver_create(ser_USART1);
+    //OTAA SETUP
+    if (lora_driver_rn2483_factory_reset() != LoRA_OK)
+    {
+        // Something went wrong
+    }
+    if (lora_driver_configure_to_eu868() != LoRA_OK)
+    {
+        // Something went wrong
+    }
+    static char dev_eui[17]; // It is static to avoid it to occupy stack space in the task
+    if (lora_driver_get_rn2483_hweui(dev_eui) != LoRA_OK)
+    {
+        // Something went wrong
+    }
+    if (lora_driver_set_otaa_identity(LORA_appEUI,LORA_appKEY,dev_eui) != LoRA_OK)
+    {
+        // Something went wrong
+    }
 }

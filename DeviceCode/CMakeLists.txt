@@ -55,9 +55,11 @@ if((NOT EXISTS "${PROJECT_SOURCE_DIR}/src"))
     FILE(MAKE_DIRECTORY src)
 endif()
 
+
 file(GLOB SRC_FILES "src/*.c") # Load all files in src folder
 file(GLOB HEADER_FILES "include/*.h")
-include_directories(include)
+ADD_LIBRARY(GENERAL_LIB ${SRC_FILES} ${HEADER_FILES})
+
 
 #Pass wall config here if you want to have a strict compiler
 add_compile_options(
@@ -82,8 +84,7 @@ add_compile_options(
 # Create one target
 add_executable(${PRODUCT_NAME} main.c ${SRC_FILES})
 
-#UNCOMMENT IN YOU NEED TO LINK .A FILES
-target_link_libraries(${PRODUCT_NAME} "${PROJECT_SOURCE_DIR}/include/libserialLib.a")
+
 
 ##############################################################################################################################################################
 ###============================================================ COMPILE / UPLOAD SETUP ====================================================================###
@@ -123,16 +124,24 @@ endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/FreeRTOS/VIA_FreeRTOS_AVRMEGA/src)
 
+
+############################################ FREE RTOS LINKER SETUP ###########################################################
+
 file(GLOB RTOS_SRC_FILES "${PROJECT_SOURCE_DIR}/FreeRTOS/VIA_FreeRTOS_AVRMEGA/src/*.c") # Load all files in src folder
 file(GLOB RTOS_DRIVER_SRC_FILES "${PROJECT_SOURCE_DIR}/FreeRTOS/VIA_FreeRTOS_AVRMEGA/FreeRTOSTraceDriver/*.c") # Load all files in src folder
 
+############################################ ACTUAL SOURCE LINKER SETUP #######################################################
 
+############################################ LIBRARY LINKING ##################################################################
 
 ADD_LIBRARY(RTOS_LIB ${RTOS_SRC_FILES} ${RTOS_DRIVER_SRC_FILES})
-ADD_LIBRARY(GENERAL_LIB ${SRC_FILES} ${HEADER_FILES})
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} RTOS_LIB)
+#UNCOMMENT IN YOU NEED TO LINK .A FILES
+target_link_libraries(${PRODUCT_NAME} "${PROJECT_SOURCE_DIR}/SensorDrivers/libIotLibrary.a")
+target_link_libraries(${PROJECT_NAME} RTOS_LIB)
 
 include_directories($ENV{AVR8_HOME}/avr/include/avr)
 include_directories($ENV{AVR8_HOME}/avr/include/util)
+include_directories(SensorDrivers)
+include_directories(include)
 
