@@ -1,8 +1,7 @@
 package embedded.BridgeApp;
 
 import embedded.BridgeApp.application.Element;
-import embedded.BridgeApp.application.data.Data;
-import embedded.BridgeApp.application.data.TemperatureData;
+import embedded.BridgeApp.application.data.MovementData;
 import embedded.BridgeApp.persistance.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -28,6 +27,8 @@ public class MongoTestCommandLineRunner implements CommandLineRunner {
     private MovementRepository movementRepository;
     @Autowired
     private LightRepository lightRepository;
+    @Autowired
+    private MongoRepository mongoRepository;
 
 
     static Random rn = new Random();
@@ -58,23 +59,23 @@ public class MongoTestCommandLineRunner implements CommandLineRunner {
 //        carbonDioxideRepository.delete(dataC);
 //        temperatureRepository.delete(dataT);
 
-         //generateDummyTemperatureData(50).stream()
-//                 .map(data -> (TemperatureData) data)
-//                 .map(Data::getValue)
-//                 .forEach(System.out::println);
+       generateDummyMovementData(50).stream().map(element -> (MovementData) element).forEach(element -> {
+           System.out.println(element);
+           movementRepository.save(element);
+       });
 
     }
 
 
-    List<Element> generateDummyTemperatureData(int amount) {
+    List<Element> generateDummyMovementData(int amount) {
         var elements = new LinkedList<Element>();
 
         LocalDateTime time = LocalDateTime.now();
-        var value = 20.0;
+        var value = 150.0;
         var id = "TestDevice";
 
         for (int i = 0; i < amount; i++) {
-            elements.add(new TemperatureData(time, value, id));
+            elements.add(new MovementData(time, value, id));
             value = generateNewValue(value);
             time = time.plusMinutes(5);
         }
