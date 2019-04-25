@@ -22,16 +22,16 @@ void toggleLights(){
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     while(1){
         //FIXME IMPLEMENT ME
-            printf("PRE-DELAY-TOGGLE \n");
-            if(privatePreferences->lightPreference){
-                PORTB^=_BV(LIGHT_PORT);
-                vTaskDelay(LIGHT_DURATION_S);
-                PORTB^=_BV(LIGHT_PORT);
-                vTaskSuspend(eventReactorTask);
-            } else{
-                printf("POST-DELAY-TOGGLE \n");
-                vTaskSuspend(eventReactorTask);
-            }
+        printf("PRE-DELAY-TOGGLE \n");
+        if(privatePreferences->lightPreference){
+            PORTB^=_BV(LIGHT_PORT);
+            vTaskDelay(LIGHT_DURATION_S);
+            PORTB^=_BV(LIGHT_PORT);
+            vTaskSuspend(eventReactorTask);
+        } else{
+            printf("POST-DELAY-TOGGLE \n");
+            vTaskSuspend(eventReactorTask);
+        }
     }
 #pragma clang diagnostic pop
 }

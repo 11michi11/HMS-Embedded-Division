@@ -4,23 +4,27 @@
 #include <lora_driver.h>
 #include <util/delay.h>
 
+
 #define LAURA_IO_TASK_PRIORITY (tskIDLE_PRIORITY+2)
 
 #define LORA_appEUI "E81068FC10812076"
 #define LORA_appKEY "3894B87078D8A38B56E419ABCA16043E"
 
-#define CO2_PAYLOAD_INDEX 0
-#define TEMP_PAYLOAD_INDEX 1
-#define HUMIDITY_PAYLOAD_INDEX 2
-#define SOUND_PAYLOAD_INDEX 3
-#define MOVEMENT_PAYLOAD_INDEX 4
-#define LIGHT_PAYLOAD_INDEX 5
+#define CO2_LOW_PAYLOAD_INDEX 0
+#define CO2_HIGH_PAYLOAD_INDEX 1
+#define TEMP_PAYLOAD_INDEX 2
+#define HUMIDITY_PAYLOAD_INDEX 3
+#define SOUND_PAYLOAD_INDEX 4
+#define MOVEMENT_PAYLOAD_INDEX 5
+#define LED_TASK_PRIORITY 7
+#define LIGHT_PAYLOAD_INDEX 6
 
 static preferences_t* privatePreferences;
 static SemaphoreHandle_t* privateSemaphore;
 static sensor_data_t* privateSensorData;
 static TaskHandle_t ioTaskHandle=NULL;
 static TimerHandle_t lauraTimer;
+static TaskHandle_t shitTask;
 
 
 // 5 minute delay in ticks
@@ -34,10 +38,12 @@ void initializeHelper(sensor_data_t* sensorData, SemaphoreHandle_t* semaphoreHan
     privateSemaphore=semaphoreHandle;
     privateSensorData=sensorData;
 
-    xTaskCreate(handleMessage,"MESSAGE_HANDLE",configMINIMAL_STACK_SIZE,NULL,LAURA_IO_TASK_PRIORITY,&ioTaskHandle);
-    vTaskSuspend(ioTaskHandle);
-    lauraTimer=xTimerCreate("SENSOR_TIMER",IO_DELAY,pdFALSE,(void*)0,lauraTimerCallback);
-    xTimerStart(lauraTimer,0);
+//    xTaskCreate(handleMessage,"MESSAGE_HANDLE",configMINIMAL_STACK_SIZE,NULL,LAURA_IO_TASK_PRIORITY,&ioTaskHandle);
+    xTaskCreate(laura_setup,"MESSAGE_HANDLE",configMINIMAL_STACK_SIZE,NULL,LAURA_IO_TASK_PRIORITY,&shitTask);
+
+//    vTaskSuspend(ioTaskHandle);
+//    lauraTimer=xTimerCreate("SENSOR_TIMER",IO_DELAY,pdFALSE,(void*)0,lauraTimerCallback);
+//    xTimerStart(lauraTimer,0);
 }
 
 void handleMessage(){
@@ -48,8 +54,11 @@ void handleMessage(){
         //FIXME IMPLEMENT ME
         xSemaphoreTake(*privateSemaphore,IO_DELAY);
         lora_payload_t loraPayload;
-        loraPayload.len=6;
-        loraPayload.bytes[CO2_PAYLOAD_INDEX]=privateSensorData->CO2;
+        loraPayload.len=7;
+        uint8_t xlow = privateSensorData->CO2 & 0xff;
+        uint8_t xhigh = (privateSensorData->CO2 >> 8);
+        loraPayload.bytes[CO2_LOW_PAYLOAD_INDEX]=xlow;
+        loraPayload.bytes[CO2_HIGH_PAYLOAD_INDEX]=xhigh;
         loraPayload.bytes[TEMP_PAYLOAD_INDEX]=privateSensorData->temperature;
         loraPayload.bytes[HUMIDITY_PAYLOAD_INDEX]=privateSensorData->humidity;
         loraPayload.bytes[MOVEMENT_PAYLOAD_INDEX]=privateSensorData->movement;
@@ -86,24 +95,30 @@ void lauraTimerCallback(TimerHandle_t pxTimer){
     vTaskResume(ioTaskHandle);
 }
 void laura_setup(){
+    while(1){
+        hal_create(LED_TASK_PRIORITY);
+        lora_driver_create(ser_USART1);
+        //OTAA SETUP
+        if (lora_driver_rn2483_factory_reset() != LoRA_OK)
+        {
+            // Something went wrong
+        }
+        if (lora_driver_configure_to_eu868() != LoRA_OK)
+        {
+            // Something went wrong
+        }
+        static char dev_eui[17]; // It is static to avoid it to occupy stack space in the task
+        if (lora_driver_get_rn2483_hweui(dev_eui) != LoRA_OK)
+        {
+            // Something went wrong
+        }
+        if (lora_driver_set_otaa_identity(LORA_appEUI,LORA_appKEY,dev_eui) != LoRA_OK)
+        {
+            // Something went wrong
+        }
+        printf("%s, TACO TUESDAY \n",dev_eui);
+        vTaskSuspend(&shitTask);
+    }
     //FIXME
-    lora_driver_create(ser_USART1);
-    //OTAA SETUP
-    if (lora_driver_rn2483_factory_reset() != LoRA_OK)
-    {
-        // Something went wrong
-    }
-    if (lora_driver_configure_to_eu868() != LoRA_OK)
-    {
-        // Something went wrong
-    }
-    static char dev_eui[17]; // It is static to avoid it to occupy stack space in the task
-    if (lora_driver_get_rn2483_hweui(dev_eui) != LoRA_OK)
-    {
-        // Something went wrong
-    }
-    if (lora_driver_set_otaa_identity(LORA_appEUI,LORA_appKEY,dev_eui) != LoRA_OK)
-    {
-        // Something went wrong
-    }
+
 }

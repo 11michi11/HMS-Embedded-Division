@@ -7,12 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class LoraTranslator {
-    public static List<Element> translateDataFromDevice(String data, String deviceId) {
+
+    public static List<Element> translateDataFromDevice(String data, String eui) {
         byte[] dataArray = hexStringToByteArray(data);
         return loadData(dataArray,deviceId);
     }
 
-    public static String translateOperationCodeToData(OperationCode code){
+    public static String translateOperationCodeToData(OperationCode code, int deviceID){
         return null;
     }
 
