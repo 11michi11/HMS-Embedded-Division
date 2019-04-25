@@ -5,7 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class LoraTranslator {
-    public static List<Element> translateDataFromDevice(String data) {
+
+    public static List<Element> translateDataFromDevice(String data, String eui) {
         List<Element> dataList = new LinkedList<>();
         byte[] dataArray = hexStringToByteArray(data);
 

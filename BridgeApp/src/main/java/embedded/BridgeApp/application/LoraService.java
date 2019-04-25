@@ -7,8 +7,6 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 @Component

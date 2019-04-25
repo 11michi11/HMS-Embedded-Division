@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 public class HandleDevice extends StompSessionHandlerAdapter {
 
@@ -37,13 +38,15 @@ public class HandleDevice extends StompSessionHandlerAdapter {
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-        Message msg = (Message) payload;
-       // System.out.println("Received : " + msg.getText() + " from : " + msg.getFrom());
+        LoraDownlinkMessage msg = (LoraDownlinkMessage) payload;
+        List<Element> elements = LoraTranslator.translateDataFromDevice(msg.getData(), msg.getEui());
+        mongoRepository.save(elements);
+        // System.out.println("Received : " + msg.getText() + " from : " + msg.getFrom());
     }
 
     @Override
     public Type getPayloadType(StompHeaders headers) {
-        return Message.class;
+        return LoraDownlinkMessage.class;
     }
 
     @Override
