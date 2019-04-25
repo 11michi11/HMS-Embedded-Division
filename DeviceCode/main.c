@@ -15,10 +15,6 @@
 SemaphoreHandle_t semaphoreHandle;
 sensor_data_t* sensorData;
 preferences_t* preferences;
-TimerHandle_t loraInitializerCountdown;
-
-void loraInitialize();
-
 int main() {
     stdioCreate(0);
     sei();
@@ -27,7 +23,7 @@ int main() {
     preferences->lightPreference=1;
     semaphoreHandle= xSemaphoreCreateMutex();
     initializeEventReactor(preferences);
-    initializeDataCollector(sensorData,&semaphoreHandle);
+    initialize_data_collector(sensorData, &semaphoreHandle);
 //    initializeHelper(sensorData,&semaphoreHandle,preferences);
     vTaskStartScheduler();
 

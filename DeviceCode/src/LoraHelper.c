@@ -55,10 +55,11 @@ void handleMessage(){
         xSemaphoreTake(*privateSemaphore,IO_DELAY);
         lora_payload_t loraPayload;
         loraPayload.len=7;
-        uint8_t xlow = privateSensorData->CO2 & 0xff;
-        uint8_t xhigh = (privateSensorData->CO2 >> 8);
-        loraPayload.bytes[CO2_LOW_PAYLOAD_INDEX]=xlow;
-        loraPayload.bytes[CO2_HIGH_PAYLOAD_INDEX]=xhigh;
+        // Separating
+        unsigned char lsb = (unsigned)privateSensorData->CO2 & 0xff; // Mask lower 8
+        unsigned char msb = (unsigned)privateSensorData->CO2 >> 8;   // Shift higher 8 bits
+        loraPayload.bytes[CO2_LOW_PAYLOAD_INDEX]=lsb;
+        loraPayload.bytes[CO2_HIGH_PAYLOAD_INDEX]=msb;
         loraPayload.bytes[TEMP_PAYLOAD_INDEX]=privateSensorData->temperature;
         loraPayload.bytes[HUMIDITY_PAYLOAD_INDEX]=privateSensorData->humidity;
         loraPayload.bytes[MOVEMENT_PAYLOAD_INDEX]=privateSensorData->movement;

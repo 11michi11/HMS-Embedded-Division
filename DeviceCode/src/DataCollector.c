@@ -29,20 +29,29 @@ static hcSr501_p hcSr501Inst=NULL;
 
 static TimerHandle_t sensorTimer;
 
-void sensorTimerCallback(TimerHandle_t pxTimer);
+void sensor_timer_callback(TimerHandle_t pxTimer);
 void co2_callback(uint16_t co2_ppm);
 
-void initializeDataCollector(sensor_data_t* sensorData, SemaphoreHandle_t* semaphoreHandle){
+void initialize_data_collector(sensor_data_t *sensorData, SemaphoreHandle_t *semaphoreHandle){
     sensorDataPrivate=sensorData;
     semaphore=semaphoreHandle;
+    //--------------------------------------------- CLEAN STATE SETUP --------------------------------------------------//
+    sensorDataPrivate->CO2=0;
+	sensorDataPrivate->humidity=0;
+	sensorDataPrivate->movement=0;
+	sensorDataPrivate->sound=0;
+	sensorDataPrivate->temperature=0;
 
-    xTaskCreate(gatherCO2,"CO2_TASK",configMINIMAL_STACK_SIZE,NULL,REGULAR_SENSOR_TASK_PRIORITY,&CO2Handle);
-    xTaskCreate(gatherTempAndHumidity, "TEMP_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY,
+    //--------------------------------------------- TASK AND TIMER SETUP --------------------------------------------------//
+
+    xTaskCreate(gather_co2, "CO2_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY, &CO2Handle);
+    xTaskCreate(gather_temp_and_humidity, "TEMP_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY,
                 &TempHandle);
     xTaskCreate(gatherSound,"SOUND_TASK",configMINIMAL_STACK_SIZE,NULL,REGULAR_SENSOR_TASK_PRIORITY,&SoundHandle);
-    xTaskCreate(monitorMovement,"MOVEMENT_TASK",configMINIMAL_STACK_SIZE,NULL,MOVEMENT_SENSOR_TASK_PRIORITY,&MovementHandle);
-
-    sensorTimer=xTimerCreate("SENSOR_TIMER",pdMS_TO_TICKS(1000),pdTRUE,(void*)0,sensorTimerCallback);
+    xTaskCreate(monitor_movement, "MOVEMENT_TASK", configMINIMAL_STACK_SIZE, NULL, MOVEMENT_SENSOR_TASK_PRIORITY,
+                &MovementHandle);
+    //FIXME Still need to figure out where to use this one.
+    sensorTimer= xTimerCreate("SENSOR_TIMER", pdMS_TO_TICKS(1000), pdTRUE, (void *) 0, sensor_timer_callback);
     xTimerStart(sensorTimer,0);
 
     //--------------------------------------------- MOVEMENT SENSOR SETUP --------------------------------------------------//
@@ -56,18 +65,17 @@ void initializeDataCollector(sensor_data_t* sensorData, SemaphoreHandle_t* semap
     //--------------------------------------------- TEMP_HUMIDITY SENSOR SETUP --------------------------------------------------//
     if ( HIH8120_OK == hih8120Create() )
     {
-        printf("TEMP_HUMIDITY_INITIALIZED /n");
+        printf("TEMP_HUMIDITY_INITIALIZED \n");
     }
 
 }
 
-void gatherCO2(){
+void gather_co2(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     TickType_t xLastWakeTimeCO2=xTaskGetTickCount();
     while(1){
         xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
-        //FIXME IMPLEMENT ME
         printf("CO2 TASK %d \n",xLastWakeTimeCO2);
         mh_z19_return_code_t rc;
         rc = mh_z19_take_meassuring();
@@ -76,38 +84,31 @@ void gatherCO2(){
             printf("CO2_SENSOR_ERROR\n");
         }
         xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeCO2,SENSOR_TIMER*20);
+        vTaskDelayUntil(&xLastWakeTimeCO2,SENSOR_TIMER*60);
     }
 
 #pragma clang diagnostic pop
 }
 
-void gatherTempAndHumidity(){
+void gather_temp_and_humidity(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     TickType_t xLastWakeTimeTemp=xTaskGetTickCount();
     while(1){
-        xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
+        xSemaphoreTake(*semaphore,SENSOR_TIMER*120);
+        printf("HIH_WAKE_UP\n");
+        hih8120Wakeup();
 
-        if ( HIH8120_OK != hih8120Wakeup() )
-        {
-            printf("WAKE_UP_FAILED\n");
-        }
+        vTaskDelayUntil(&xLastWakeTimeTemp,pdMS_TO_TICKS(51));
+        printf("HIH_MEASURE\n");
 
-        vTaskDelay(pdMS_TO_TICKS(100));
-        if ( HIH8120_OK !=  hih8120Meassure() )
-        {
-            printf("MEASURE_FAILED\n");
-        }
+        hih8120Meassure();
+        vTaskDelayUntil(&xLastWakeTimeTemp,pdMS_TO_TICKS(51));
+        
+        sensorDataPrivate->temperature+=hih8120GetTemperature_x10()/10;
+        sensorDataPrivate->humidity+=hih8120GetHumidityPercent_x10()/10;
 
-        float humidity = 0.0;
-        float temperature = 0.0;
-        humidity = hih8120GetHumidity();
-        temperature = hih8120GetTemperature();
-        uint8_t *array;
-        array = (uint8_t*)(&temperature);
-        printf("%i:%i:%i:%i \n",array[0],array[1],array[2],array[3]);
-        printf("%.2f:TEMP\n",temperature);
+        printf("%i:TEMP:%i:HUMID \n",sensorDataPrivate->temperature,sensorDataPrivate->humidity);
         xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeTemp,SENSOR_TIMER*60);
     }
@@ -115,14 +116,13 @@ void gatherTempAndHumidity(){
 
 }
 
-void gatherSound(){
+void gather_sound(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     TickType_t xLastWakeTimeSound=xTaskGetTickCount();
     while(1){
         xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
         printf("SOUND TASK \n");
-        sensorDataPrivate->temperature+=rand()%200;
         //FIXME IMPLEMENT ME
         xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeSound,SENSOR_TIMER*60);
@@ -131,7 +131,7 @@ void gatherSound(){
 
 }
 
-void monitorMovement(){
+void monitor_movement(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
@@ -139,7 +139,6 @@ void monitorMovement(){
     while(1){
         xSemaphoreTake(*semaphore,SENSOR_TIMER);
         printf("MOVEMENT TASK \n");
-        //FIXME Remove the following 3 lines as it's simply for testing purposes
         if ( hcSr501IsDetecting(hcSr501Inst) )
         {
             sensorDataPrivate->movement+=1;
@@ -153,7 +152,6 @@ void monitorMovement(){
             xSemaphoreGive(*semaphore);
             vTaskDelayUntil(&xLastWakeTimeMovement,SENSOR_TIMER*1);
         }
-        //FIXME IMPLEMENT ME
     }
 #pragma clang diagnostic pop
 }
@@ -163,6 +161,6 @@ void co2_callback(uint16_t co2_ppm){
     printf("%i CO2_DATA \n",sensorDataPrivate->CO2);
 }
 
-void sensorTimerCallback(TimerHandle_t pxTimer){
+void sensor_timer_callback(TimerHandle_t pxTimer){
     xSemaphoreGive(*semaphore);
 }

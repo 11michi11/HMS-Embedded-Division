@@ -3,8 +3,6 @@
 #define SEP4_DEVICE_CODE_EVENTREACTOR_H
 
 #include <ATMEGA_FreeRTOS.h>
-#include <io.h>
-#include <ATMEGA_FreeRTOS.h>
 #include <stdint-gcc.h>
 #include <stdio.h>
 #include <semphr.h>
