@@ -1,8 +1,11 @@
 package embedded.BridgeApp.application;
 
 public enum OperationCode {
-    //turnOnBuzzer
-    TURN_ON_BUZZER((byte)1);
+
+    TURN_ON_BUZZER((byte)1),
+    TURN_OFF_BUZZER((byte)2),
+    TURN_ON_AUTOMATIC_LIGHTS((byte)3),
+    TURN_OFF_AUTOMATIC_LIGHTS((byte)4);
 
 
     private byte code;
