@@ -1,18 +1,18 @@
 package embedded.BridgeApp.application;
 
-import java.nio.ByteBuffer;
+import embedded.BridgeApp.application.data.*;
+
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
 public class LoraTranslator {
-    public static List<Element> translateDataFromDevice(String data) {
-        List<Element> dataList = new LinkedList<>();
+    public static List<Element> translateDataFromDevice(String data, String deviceId) {
         byte[] dataArray = hexStringToByteArray(data);
-
-        return null;
+        return loadData(dataArray,deviceId);
     }
 
-    public static byte[] translateOperationCodeToData(OperationCode code){
+    public static String translateOperationCodeToData(OperationCode code){
         return null;
     }
 
@@ -26,13 +26,14 @@ public class LoraTranslator {
         return data;
     }
 
-    private static List<Element> loadData(byte[] dataArray) {
-
+    private static List<Element> loadData(byte[] dataArray, String deviceId) {
+        List<Element> dataList = new LinkedList<>();
+        LocalDateTime currentTime = LocalDateTime.now();
+        dataList.add(new CarbonDioxideData(currentTime,dataArray[0]+(dataArray[1]<<8),deviceId));
+        dataList.add(new TemperatureData(currentTime,dataArray[2],deviceId));
+        dataList.add(new HumidityData(currentTime,dataArray[3],deviceId));
+        dataList.add(new SoundData(currentTime,dataArray[4],deviceId));
+        dataList.add(new MovementData(currentTime,dataArray[5],deviceId));
+        return dataList;
     }
-
-    private static double loadSensorData(byte[] sensorData) {
-        return ByteBuffer.wrap(sensorData).getDouble();
-    }
-
-
 }
