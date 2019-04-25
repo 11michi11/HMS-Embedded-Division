@@ -13,9 +13,6 @@ import java.util.List;
 
 public class HandleDevice extends StompSessionHandlerAdapter {
 
-    @Getter
-    private int deviceId;
-
     @Autowired
     private MongoRepository mongoRepository;
     private String downlinkTopic = "/topic/messages";

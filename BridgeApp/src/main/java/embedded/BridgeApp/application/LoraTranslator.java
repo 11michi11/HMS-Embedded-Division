@@ -13,7 +13,7 @@ public class LoraTranslator {
         return null;
     }
 
-    public static byte[] translateOperationCodeToData(OperationCode code){
+    public static String translateOperationCodeToData(OperationCode code, int deviceID){
         return null;
     }
 
