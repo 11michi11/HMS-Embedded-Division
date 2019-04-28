@@ -12,13 +12,13 @@ public class BuzzerController {
     private BuzzerControl controller;
 
     @PutMapping(path = "/{deviceID}")
-    public void turnOnBuzzer(@PathVariable int deviceID) {
+    public void turnOnBuzzer(@PathVariable String deviceID) {
         System.out.println("Turn on buzzer on device: "+deviceID);
         controller.turnOnBuzzer(deviceID);
     }
 
     @DeleteMapping(path = "/{deviceID}")
-    public void turnOffBuzzer(@PathVariable int deviceID) {
+    public void turnOffBuzzer(@PathVariable String deviceID) {
         System.out.println("Turn off buzzer on device: "+deviceID);
         controller.turnOffBuzzer(deviceID);
     }

@@ -1,7 +1,10 @@
 package embedded.BridgeApp.application;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import embedded.BridgeApp.application.data.*;
 
+import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,8 +16,11 @@ public class LoraTranslator {
         return loadData(dataArray,eui);
     }
 
-    public static String translateOperationCodeToData(OperationCode code, int deviceID){
-        return null;
+    public static String translateOperationCodeToData(OperationCode code, String deviceID){
+        String data = String.format("%02x",code.getCode());
+        LoraUplinkMessage uplinkMessage = new LoraUplinkMessage(deviceID,data);
+        Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).create();
+        return gson.toJson(uplinkMessage);
     }
 
     private static byte[] hexStringToByteArray(String s) {

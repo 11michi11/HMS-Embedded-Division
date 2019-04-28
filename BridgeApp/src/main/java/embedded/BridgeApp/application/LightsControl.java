@@ -1,6 +1,6 @@
 package embedded.BridgeApp.application;
 
 public interface LightsControl {
-    public void turnOnMovementDetection(int deviceID);
-    public void turnOffMovementDetection(int deviceID);
+    public void turnOnMovementDetection(String deviceID);
+    public void turnOffMovementDetection(String deviceID);
 }

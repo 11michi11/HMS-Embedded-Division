@@ -1,7 +1,6 @@
 package embedded.BridgeApp.application;
 
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -29,25 +28,25 @@ public class LoraService implements LightsControl, BuzzerControl {
     }
 
     @Override
-    public void turnOnBuzzer(int deviceID) {
+    public void turnOnBuzzer(String deviceID) {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_BUZZER, deviceID);
         sessionHandler.sendCommand(data);
     }
 
     @Override
-    public void turnOffBuzzer(int deviceID) {
+    public void turnOffBuzzer(String deviceID) {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_BUZZER, deviceID);
         sessionHandler.sendCommand(data);
     }
 
     @Override
-    public void turnOnMovementDetection(int deviceID) {
+    public void turnOnMovementDetection(String deviceID) {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_AUTOMATIC_LIGHTS, deviceID);
         sessionHandler.sendCommand(data);
     }
 
     @Override
-    public void turnOffMovementDetection(int deviceID) {
+    public void turnOffMovementDetection(String deviceID) {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_AUTOMATIC_LIGHTS, deviceID);
         sessionHandler.sendCommand(data);
     }

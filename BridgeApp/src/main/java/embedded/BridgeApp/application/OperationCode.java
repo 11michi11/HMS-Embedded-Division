@@ -13,4 +13,8 @@ public enum OperationCode {
     OperationCode(byte code) {
         this.code = code;
     }
+
+    public byte getCode() {
+        return code;
+    }
 }
