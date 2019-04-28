@@ -14,9 +14,8 @@
 #define CO2_HIGH_PAYLOAD_INDEX 1
 #define TEMP_PAYLOAD_INDEX 2
 #define HUMIDITY_PAYLOAD_INDEX 3
-#define SOUND_PAYLOAD_INDEX 4
+#define LIGHT_PAYLOAD_INDEX 4
 #define MOVEMENT_PAYLOAD_INDEX 5
-#define LIGHT_PAYLOAD_INDEX 6
 #define LORA_INIT_TASK_PRIORITY 7
 
 static preferences_t* privatePreferences;
@@ -66,8 +65,8 @@ void handle_message(){
         loraPayload.bytes[TEMP_PAYLOAD_INDEX]=privateSensorData->temperature/5;
         loraPayload.bytes[HUMIDITY_PAYLOAD_INDEX]=privateSensorData->humidity/5;
         loraPayload.bytes[MOVEMENT_PAYLOAD_INDEX]=privateSensorData->movement/5;
-        loraPayload.bytes[SOUND_PAYLOAD_INDEX]=privateSensorData->sound/5;
-        printf("%dc,%dt,%dh,%ds,%dm PRE-REMOVE \n",privateSensorData->CO2/5,privateSensorData->temperature/5,privateSensorData->humidity/5,privateSensorData->sound/5,privateSensorData->movement/5);
+        loraPayload.bytes[LIGHT_PAYLOAD_INDEX]=privateSensorData->light/5;
+        printf("%dc,%dt,%dh,%ds,%dm PRE-REMOVE \n",privateSensorData->CO2/5,privateSensorData->temperature/5,privateSensorData->humidity/5,privateSensorData->light/5,privateSensorData->movement/5);
         e_LoRa_return_code_t returnCode;
         if ((returnCode = lora_driver_sent_upload_message(false, &loraPayload)) == LoRa_MAC_TX_OK )
         {
@@ -81,11 +80,11 @@ void handle_message(){
 		printf("%d:LORA RETURN CODE \n",returnCode);
 		printf("%d:LSB,%d MSB",lsb,msb);
         privateSensorData->movement=0;
-        privateSensorData->sound=0;
+        privateSensorData->light=0;
         privateSensorData->humidity=0;
         privateSensorData->temperature=0;
         privateSensorData->CO2=0;
-        printf("%dc,%dt,%dh,%ds,%dm POST-REMOVE",privateSensorData->CO2,privateSensorData->temperature,privateSensorData->humidity,privateSensorData->sound,privateSensorData->movement);
+        printf("%dc,%dt,%dh,%ds,%dm POST-REMOVE",privateSensorData->CO2,privateSensorData->temperature,privateSensorData->humidity,privateSensorData->light,privateSensorData->movement);
         xSemaphoreGive(*privateSemaphore);
         vTaskDelayUntil(&xLastWakeTimeLoraSendOff,IO_DELAY);
     }

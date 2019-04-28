@@ -18,7 +18,7 @@
 typedef struct sensor_data{
     uint16_t CO2;
     uint16_t temperature;
-    uint16_t sound;
+    uint16_t light;
     uint16_t movement;
     uint16_t humidity;
 }sensor_data_t;
@@ -26,7 +26,7 @@ typedef struct sensor_data{
 void initialize_data_collector(sensor_data_t *sensorData, SemaphoreHandle_t *semaphoreHandle);
 void gather_co2();
 void gather_temp_and_humidity();
-void gather_sound();
+void gather_light();
 void monitor_movement();
 
 #endif //SEP4_DEVICE_CODE_DATACOLLECTOR_H
