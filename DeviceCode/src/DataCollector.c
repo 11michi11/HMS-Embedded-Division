@@ -11,6 +11,7 @@
 #include <mh_z19.h>
 #include <serial.h>
 #include <hih8120.h>
+#include <tsl2591.h>
 
 //FIXME Define final ports
 
@@ -31,23 +32,24 @@ static TimerHandle_t sensorTimer;
 
 void sensor_timer_callback(TimerHandle_t pxTimer);
 void co2_callback(uint16_t co2_ppm);
+void light_callback(tsl2591ReturnCode_t rc);
 
 void initialize_data_collector(sensor_data_t *sensorData, SemaphoreHandle_t *semaphoreHandle){
     sensorDataPrivate=sensorData;
     semaphore=semaphoreHandle;
     //--------------------------------------------- CLEAN STATE SETUP --------------------------------------------------//
     sensorDataPrivate->CO2=0;
-	sensorDataPrivate->humidity=0;
-	sensorDataPrivate->movement=0;
-	sensorDataPrivate->sound=0;
-	sensorDataPrivate->temperature=0;
+    sensorDataPrivate->humidity=0;
+    sensorDataPrivate->movement=0;
+    sensorDataPrivate->light=0;
+    sensorDataPrivate->temperature=0;
 
     //--------------------------------------------- TASK AND TIMER SETUP --------------------------------------------------//
 
     xTaskCreate(gather_co2, "CO2_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY, &CO2Handle);
     xTaskCreate(gather_temp_and_humidity, "TEMP_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY,
                 &TempHandle);
-    xTaskCreate(gather_sound,"SOUND_TASK",configMINIMAL_STACK_SIZE,NULL,REGULAR_SENSOR_TASK_PRIORITY,&SoundHandle);
+    xTaskCreate(gather_light, "SOUND_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY, &SoundHandle);
     xTaskCreate(monitor_movement, "MOVEMENT_TASK", configMINIMAL_STACK_SIZE, NULL, MOVEMENT_SENSOR_TASK_PRIORITY,
                 &MovementHandle);
     //FIXME Still need to figure out where to use this one.
@@ -60,14 +62,22 @@ void initialize_data_collector(sensor_data_t *sensorData, SemaphoreHandle_t *sem
     {
         printf("DRIVER_INITIALIZED \n");
     }
+    //--------------------------------------------- MOVEMENT SENSOR SETUP --------------------------------------------------//
+
     //--------------------------------------------- CO_2 SENSOR SETUP --------------------------------------------------//
     mh_z19_create(ser_USART3, co2_callback);
+    //--------------------------------------------- CO_2 SENSOR SETUP --------------------------------------------------//
+
     //--------------------------------------------- TEMP_HUMIDITY SENSOR SETUP --------------------------------------------------//
     if ( HIH8120_OK == hih8120Create() )
     {
         printf("TEMP_HUMIDITY_INITIALIZED \n");
     }
+    //--------------------------------------------- TEMP_HUMIDITY SENSOR SETUP --------------------------------------------------//
 
+    //--------------------------------------------- LIGHT SENSOR SETUP --------------------------------------------------//
+    tsl2591Create(light_callback);
+    //--------------------------------------------- LIGHT SENSOR SETUP --------------------------------------------------//
 }
 
 void gather_co2(){
@@ -86,7 +96,6 @@ void gather_co2(){
         xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeCO2,SENSOR_TIMER*60);
     }
-
 #pragma clang diagnostic pop
 }
 
@@ -95,16 +104,16 @@ void gather_temp_and_humidity(){
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     TickType_t xLastWakeTimeTemp=xTaskGetTickCount();
     while(1){
+        //FIXME Ask Ib about the status codes that are returned Measure / WakeUp
         xSemaphoreTake(*semaphore,SENSOR_TIMER*120);
         printf("HIH_WAKE_UP\n");
         hih8120Wakeup();
-
         vTaskDelayUntil(&xLastWakeTimeTemp,pdMS_TO_TICKS(51));
         printf("HIH_MEASURE\n");
 
         hih8120Meassure();
         vTaskDelayUntil(&xLastWakeTimeTemp,pdMS_TO_TICKS(51));
-   
+
         sensorDataPrivate->temperature+=hih8120GetTemperature_x10()/10;
         sensorDataPrivate->humidity+=hih8120GetHumidityPercent_x10()/10;
 
@@ -116,16 +125,26 @@ void gather_temp_and_humidity(){
 
 }
 
-void gather_sound(){
+void gather_light(){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
-    TickType_t xLastWakeTimeSound=xTaskGetTickCount();
+    TickType_t xLastWakeTimeLight=xTaskGetTickCount();
     while(1){
+        //FIXME SWAP TO LUX WHEN IT'S ACTUALLY IMPLEMENTED
+        printf("LIGHT TASK \n");
         xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
-        printf("SOUND TASK \n");
-        //FIXME IMPLEMENT ME
+        tsl2591Enable();
+        vTaskDelay(150);
+        tsl2591FetchData();
+        vTaskDelay(150);
+        uint16_t light;
+        tsl2591GetVisibleRaw(&light);
+        vTaskDelay(150);
+        printf("%i:VISIBLE LIGHT \n",light);
+        sensorDataPrivate->light+=light;
+        tsl2591Disable();
         xSemaphoreGive(*semaphore);
-        vTaskDelayUntil(&xLastWakeTimeSound,SENSOR_TIMER*60);
+        vTaskDelayUntil(&xLastWakeTimeLight,SENSOR_TIMER*60);
     }
 #pragma clang diagnostic pop
 
@@ -163,4 +182,8 @@ void co2_callback(uint16_t co2_ppm){
 
 void sensor_timer_callback(TimerHandle_t pxTimer){
     xSemaphoreGive(*semaphore);
+}
+
+void light_callback(tsl2591ReturnCode_t rc){
+    printf("%i:RETURN CODE\n",rc);
 }
