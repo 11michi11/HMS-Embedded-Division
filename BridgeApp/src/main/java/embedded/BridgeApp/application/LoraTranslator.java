@@ -13,13 +13,13 @@ public class LoraTranslator {
 
     public static List<Element> translateDataFromDevice(String data, String eui) {
         byte[] dataArray = hexStringToByteArray(data);
-        return loadData(dataArray,eui);
+        return loadData(dataArray, eui);
     }
 
-    public static String translateOperationCodeToData(OperationCode code, String deviceID){
-        String data = String.format("%02x",code.getCode());
-        LoraUplinkMessage uplinkMessage = new LoraUplinkMessage(deviceID,data);
-        Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).create();
+    public static String translateOperationCodeToData(OperationCode code, String deviceID) {
+        String data = String.format("%02x", code.getCode());
+        LoraUplinkMessage uplinkMessage = new LoraUplinkMessage(deviceID, data);
+        Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithoutExposeAnnotation().create();
         return gson.toJson(uplinkMessage);
     }
 
@@ -28,19 +28,18 @@ public class LoraTranslator {
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
+                    + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }
 
     private static List<Element> loadData(byte[] dataArray, String deviceId) {
-        List<Element> dataList = new LinkedList<>();
         LocalDateTime currentTime = LocalDateTime.now();
-        dataList.add(new CarbonDioxideData(currentTime,dataArray[0]+(dataArray[1]<<8),deviceId));
-        dataList.add(new TemperatureData(currentTime,dataArray[2],deviceId));
-        dataList.add(new HumidityData(currentTime,dataArray[3],deviceId));
-        dataList.add(new SoundData(currentTime,dataArray[4],deviceId));
-        dataList.add(new MovementData(currentTime,dataArray[5],deviceId));
-        return dataList;
+        return List.of(
+                new CarbonDioxideData(currentTime, dataArray[0] + (dataArray[1] << 8), deviceId),
+                new TemperatureData(currentTime, dataArray[2], deviceId),
+                new HumidityData(currentTime, dataArray[3], deviceId),
+                new SoundData(currentTime, dataArray[4], deviceId),
+                new MovementData(currentTime, dataArray[5], deviceId));
     }
 }
