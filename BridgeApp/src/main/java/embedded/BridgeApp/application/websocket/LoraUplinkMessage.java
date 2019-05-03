@@ -1,4 +1,4 @@
-package embedded.BridgeApp.application;
+package embedded.BridgeApp.application.websocket;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

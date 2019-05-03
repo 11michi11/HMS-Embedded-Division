@@ -1,13 +1,12 @@
-package embedded.BridgeApp.application;
+package embedded.BridgeApp.application.websocket;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import embedded.BridgeApp.application.Element;
 import embedded.BridgeApp.application.data.*;
 
 import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public class LoraTranslator {

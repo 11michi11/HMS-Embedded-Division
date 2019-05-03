@@ -1,4 +1,4 @@
-package embedded.BridgeApp.application;
+package embedded.BridgeApp.application.websocket;
 
 public enum OperationCode {
 

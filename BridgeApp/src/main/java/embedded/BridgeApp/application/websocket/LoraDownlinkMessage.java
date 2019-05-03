@@ -1,4 +1,4 @@
-package embedded.BridgeApp.application;
+package embedded.BridgeApp.application.websocket;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class LoraDownlinkMessage {
     private String cmd;
-    private String eui;
+    private String EUI;
     private int port;
     private boolean confirmed;
     private String data;
