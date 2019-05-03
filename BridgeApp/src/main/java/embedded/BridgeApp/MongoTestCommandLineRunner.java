@@ -59,10 +59,10 @@ public class MongoTestCommandLineRunner implements CommandLineRunner {
 //        carbonDioxideRepository.delete(dataC);
 //        temperatureRepository.delete(dataT);
 
-       generateDummyMovementData(50).stream().map(element -> (MovementData) element).forEach(element -> {
-           System.out.println(element);
-           movementRepository.save(element);
-       });
+//       generateDummyMovementData(50).stream().map(element -> (MovementData) element).forEach(element -> {
+//           System.out.println(element);
+//           movementRepository.save(element);
+//       });
 
     }
 
