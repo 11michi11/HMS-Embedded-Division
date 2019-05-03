@@ -1,6 +1,9 @@
 package embedded.BridgeApp.application;
 
 import embedded.BridgeApp.application.data.Data;
+import embedded.BridgeApp.application.websocket.LoraTranslator;
+import embedded.BridgeApp.application.websocket.LoraUplinkMessage;
+import embedded.BridgeApp.application.websocket.OperationCode;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

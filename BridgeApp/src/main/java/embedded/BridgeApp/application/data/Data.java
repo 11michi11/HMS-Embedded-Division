@@ -10,7 +10,6 @@ import java.util.Objects;
 @Document
 public abstract class Data implements Element {
 
-
     private String deviceId;
     private LocalDateTime timeStamp;
     private double data;

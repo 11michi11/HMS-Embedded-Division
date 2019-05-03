@@ -1,20 +1,19 @@
 package embedded.BridgeApp;
 
 import embedded.BridgeApp.application.LoraService;
-import embedded.BridgeApp.application.data.*;
-import embedded.BridgeApp.persistance.*;
+import embedded.BridgeApp.persistance.MongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.time.LocalDateTime;
 
 @SpringBootApplication
 public class BridgeAppApplication implements CommandLineRunner {
 
     @Autowired
     LoraService lora;
+    @Autowired
+    MongoRepository mongoRepository;
 
 
     public static void main(String[] args) {
@@ -25,6 +24,5 @@ public class BridgeAppApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         lora.start();
-
     }
 }

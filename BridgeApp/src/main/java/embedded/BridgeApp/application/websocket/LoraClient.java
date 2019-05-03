@@ -38,6 +38,11 @@ public class LoraClient implements WebSocket.Listener {
         webSocket.request(1);
         System.out.println("WebSocket Listener has been opened for requests.");
         this.webSocket = webSocket;
+
+//
+//        var msg = new LoraDownlinkMessage("tx", "0004A30B0021D2A1", 1, false, "Bon Jovi went out in a Blaze of Glory because they stood behind Chuck Norris when he lit a fart!");
+//        var gson = new Gson();
+//        sendText(gson.toJson(msg), false);
     }
 
     public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
@@ -84,7 +89,7 @@ public class LoraClient implements WebSocket.Listener {
         if (message.getCmd().equals("rx")) {
             List<Element> elements = LoraTranslator.translateDataFromDevice(message.getData(), message.getEui());
             System.out.println("Translated");
-            elements.forEach(System.out::println);
+            elements.forEach(element -> System.out.println(element.toString() + " class: " + element.getClass().getSimpleName()));
             mongoRepository.save(elements);
         }
         return null; // new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);

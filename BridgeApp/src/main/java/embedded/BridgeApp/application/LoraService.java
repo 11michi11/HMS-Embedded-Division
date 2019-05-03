@@ -41,36 +41,6 @@ public class LoraService implements LightsControl, BuzzerControl {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_AUTOMATIC_LIGHTS, deviceID);
         sessionHandler.sendCommand(data);
     }
-
-
-//    public void javaEEWebsocket() {
-//        try {
-//            // open websocket
-//            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(URL));
-//            // add listener
-//            clientEndPoint.addMessageHandler(message -> System.out.println("Message from websocket " + message));
-//
-//            // send message to websocket
-////            clientEndPoint.sendMessage("{'event':'addChannel','channel':'ok_btccny_ticker'}");
-//            // wait 5 seconds for messages from websocket
-//            Thread.sleep(5000);
-//        } catch (InterruptedException ex) {
-//            System.err.println("InterruptedException exception: " + ex.getMessage());
-//        } catch (URISyntaxException ex) {
-//            System.err.println("URISyntaxException exception: " + ex.getMessage());
-//        }
-//    }
-//
-//    public void springWebsocket() {
-//        WebSocketClient client = new StandardWebSocketClient();
-//
-//        WebSocketStompClient stompClient = new WebSocketStompClient(client);
-//        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-//
-//        sessionHandler = new HandleDevice();
-//        stompClient.connect(URL, sessionHandler);
-//        System.out.println("Lora started");
-//    }
 }
 
 

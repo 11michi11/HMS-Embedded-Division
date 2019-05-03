@@ -14,17 +14,17 @@ public class MongoRepository implements Visitor {
     private TemperatureRepository temperatureRepository;
     private CarbonDioxideRepository carbonDioxideRepository;
     private HumidityRepository humidityRepository;
-    private MovementRepository movementrepository;
+    private MovementRepository movementRepository;
     private SoundRepository soundRepository;
     private LightRepository lightRepository;
 
 
     @Autowired
-    public MongoRepository(TemperatureRepository temperatureRepository, CarbonDioxideRepository carbonDioxideRepository, HumidityRepository humidityRepository, MovementRepository movementrepository, SoundRepository soundRepository, LightRepository lightRepository) {
+    public MongoRepository(TemperatureRepository temperatureRepository, CarbonDioxideRepository carbonDioxideRepository, HumidityRepository humidityRepository, MovementRepository movementRepository, SoundRepository soundRepository, LightRepository lightRepository) {
         this.temperatureRepository = temperatureRepository;
         this.carbonDioxideRepository = carbonDioxideRepository;
         this.humidityRepository = humidityRepository;
-        this.movementrepository = movementrepository;
+        this.movementRepository = movementRepository;
         this.soundRepository = soundRepository;
         this.lightRepository = lightRepository;
     }
@@ -54,7 +54,7 @@ public class MongoRepository implements Visitor {
 
     @Override
     public void saveMovement(MovementData data) {
-        movementrepository.save(data);
+        movementRepository.save(data);
         System.out.println("Saving movement");
     }
 
@@ -68,5 +68,14 @@ public class MongoRepository implements Visitor {
     public void saveLight(LightData data) {
         lightRepository.save(data);
         System.out.println("Saving carbon");
+    }
+
+    public void wipeDB(){
+        movementRepository.deleteAll();
+        lightRepository.deleteAll();
+        soundRepository.deleteAll();
+        humidityRepository.deleteAll();
+        carbonDioxideRepository.deleteAll();
+        temperatureRepository.deleteAll();
     }
 }
