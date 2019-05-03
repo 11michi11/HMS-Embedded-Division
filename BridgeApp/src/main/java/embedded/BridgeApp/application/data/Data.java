@@ -57,5 +57,8 @@ public abstract class Data implements Element {
         return data;
     }
 
+    public String getDeviceId() {
+        return deviceId;
+    }
 
 }
