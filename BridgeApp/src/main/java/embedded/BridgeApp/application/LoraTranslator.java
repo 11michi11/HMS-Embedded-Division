@@ -6,7 +6,6 @@ import embedded.BridgeApp.application.data.*;
 
 import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 
 public class LoraTranslator {
@@ -39,7 +38,6 @@ public class LoraTranslator {
                 new CarbonDioxideData(currentTime, dataArray[0] + (dataArray[1] << 8), deviceId),
                 new TemperatureData(currentTime, dataArray[2], deviceId),
                 new HumidityData(currentTime, dataArray[3], deviceId),
-                new SoundData(currentTime, dataArray[4], deviceId),
-                new MovementData(currentTime, dataArray[5], deviceId));
+                new MovementData(currentTime, dataArray[4], deviceId));
     }
 }
