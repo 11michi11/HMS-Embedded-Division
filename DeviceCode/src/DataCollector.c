@@ -106,19 +106,23 @@ void gather_temp_and_humidity(){
     while(1){
         //FIXME Ask Ib about the status codes that are returned Measure / WakeUp
         xSemaphoreTake(*semaphore,SENSOR_TIMER*120);
-        printf("HIH_WAKE_UP\n");
-        hih8120Wakeup();
-        vTaskDelayUntil(&xLastWakeTimeTemp,pdMS_TO_TICKS(51));
-        printf("HIH_MEASURE\n");
-
-        hih8120Meassure();
+        hih8120DriverReturnCode_t rc;
+		printf("HIH_WAKE_UP: ");
+        rc=hih8120Wakeup();
+		printf("%i \n",rc);
+		vTaskDelay(150);
+		
+		printf("HIH_MEASURE: ");
+		rc= hih8120Meassure();
+		printf("%i \n",rc);	
         vTaskDelayUntil(&xLastWakeTimeTemp,pdMS_TO_TICKS(51));
 
         sensorDataPrivate->temperature+=hih8120GetTemperature_x10()/10;
         sensorDataPrivate->humidity+=hih8120GetHumidityPercent_x10()/10;
 
-        printf("%i:TEMP:%i:HUMID \n",sensorDataPrivate->temperature,sensorDataPrivate->humidity);
-        xSemaphoreGive(*semaphore);
+        printf("%i:TEMP:%i:HUMID \n",hih8120GetTemperature_x10()/10,hih8120GetHumidityPercent_x10()/10);
+        vTaskDelay(150);
+		xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeTemp,SENSOR_TIMER*60);
     }
 #pragma clang diagnostic pop
@@ -130,19 +134,14 @@ void gather_light(){
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     TickType_t xLastWakeTimeLight=xTaskGetTickCount();
     while(1){
-        //FIXME SWAP TO LUX WHEN IT'S ACTUALLY IMPLEMENTED
         printf("LIGHT TASK \n");
         xSemaphoreTake(*semaphore,SENSOR_TIMER*60);
-        tsl2591Enable();
+        printf("%i:ENABLE_RC\n",tsl2591Enable());
         vTaskDelay(150);
         tsl2591FetchData();
         vTaskDelay(150);
-        uint16_t light;
-        tsl2591GetVisibleRaw(&light);
-        vTaskDelay(150);
-        printf("%i:VISIBLE LIGHT \n",light);
-        sensorDataPrivate->light+=light;
         tsl2591Disable();
+		vTaskDelay(150);
         xSemaphoreGive(*semaphore);
         vTaskDelayUntil(&xLastWakeTimeLight,SENSOR_TIMER*60);
     }
@@ -184,6 +183,18 @@ void sensor_timer_callback(TimerHandle_t pxTimer){
     xSemaphoreGive(*semaphore);
 }
 
-void light_callback(tsl2591ReturnCode_t rc){
-    printf("%i:RETURN CODE\n",rc);
+void light_callback(tsl2591ReturnCode_t rc) {
+	uint16_t light;
+	float _lux;
+	printf("%i:LIGHT_CALLBACK_RC\n", rc);
+	switch (rc) {
+		case TSL2591_DATA_READY: {
+			if (TSL2591_OK == (rc = tsl2591GetVisibleRaw(&light))) {
+				printf("VISIBLE_RAW_MEASURED:%i\n", light);
+				sensorDataPrivate->light += light;
+				printf("VISIBLE_RAW_ADDED:%i\n", sensorDataPrivate->light);
+			}
+			break;
+		}
+	}
 }

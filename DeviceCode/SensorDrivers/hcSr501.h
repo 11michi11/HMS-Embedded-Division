@@ -96,7 +96,8 @@ hcSr501_p hcSr501Inst = NULL;
 Add to application initialization:
 - Initialise the driver:
 \code
-if ( hcSr501Inst == hcSr501Create(&PORTA, PA6) )
+hcSr501Inst = hcSr501Create(&PORTE, PE5);
+if ( NULL != hcSr501Inst )
 {
 	// Driver created OK
 	// If NULL is returned the driver is not created!!!

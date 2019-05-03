@@ -6,6 +6,8 @@
 
 #ifndef SEP4_DEVICE_CODE_DATACOLLECTOR_H
 #define SEP4_DEVICE_CODE_DATACOLLECTOR_H
+#define REGULAR_SENSOR_TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define MOVEMENT_SENSOR_TASK_PRIORITY (tskIDLE_PRIORITY)
 
 typedef struct sensor_data{
     uint16_t CO2;
@@ -15,10 +17,6 @@ typedef struct sensor_data{
     uint16_t humidity;
 }sensor_data_t;
 
-void initialize_data_collector(sensor_data_t *sensorData, SemaphoreHandle_t *semaphoreHandle);
-void gather_co2();
-void gather_temp_and_humidity();
-void gather_light();
-void monitor_movement();
+void initialize_repository(sensor_data_t *sensorData, SemaphoreHandle_t *semaphoreHandle);
 
 #endif //SEP4_DEVICE_CODE_DATACOLLECTOR_H

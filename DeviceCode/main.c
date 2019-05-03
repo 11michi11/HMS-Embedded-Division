@@ -1,7 +1,7 @@
 #include <ATMEGA_FreeRTOS.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <DataCollector.h>
+#include "DataRepository.h"
 #include <EventReactor.h>
 #include <LoraHelper.h>
 #include <avr/interrupt.h>
@@ -22,8 +22,8 @@ int main() {
     preferences=(preferences_t*)malloc(sizeof(preferences_t));
     preferences->lightPreference=1;
     semaphoreHandle= xSemaphoreCreateMutex();
-    initializeEventReactor(preferences);
-    initialize_data_collector(sensorData, &semaphoreHandle);
+    //initializeEventReactor(preferences);
+    initialize_repository(sensorData, &semaphoreHandle);
 	initialize_lora_helper(sensorData,&semaphoreHandle,preferences);
     vTaskStartScheduler();
 	while(1){

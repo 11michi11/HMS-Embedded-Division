@@ -1,5 +1,5 @@
 
-#include <DataCollector.h>
+#include <DataRepository.h>
 #include <EventReactor.h>
 
 #ifndef SEP4_DEVICE_CODE_LORAHELPER_H
