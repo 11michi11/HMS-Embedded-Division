@@ -15,8 +15,8 @@ class LoraTranslatorTest {
     public void testTranslateDataFromDeviceOnlyLowCarbonByte() {
 
         // 80,0,58,92,0,30
-        double[] values = {80,58,92,0};
-        String data = "50003a5c00";
+        double[] values = {80,58,92,0,30};
+        String data = "50003a5c001e";
 
         List<Element> list = LoraTranslator.translateDataFromDevice(data,deviceId);
 
@@ -32,8 +32,8 @@ class LoraTranslatorTest {
     public void testTranslateDataFromDeviceBothBytesForCarbon() {
 
         // 21,3,58,92,10,30
-        double[] values = {789,58,92,30};
-        String data = "15033a5c1e";
+        double[] values = {789,58,92,10,30};
+        String data = "15033a5c0a1e";
 
         List<Element> list = LoraTranslator.translateDataFromDevice(data,deviceId);
 
