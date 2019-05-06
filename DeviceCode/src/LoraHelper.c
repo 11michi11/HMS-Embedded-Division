@@ -10,6 +10,8 @@
 #define LORA_appEUI "40f0e6960ec746d8"
 #define LORA_appKEY "234cc8845c2087ff6a56deb1f9c1d5b4"
 
+#define LORA_SECONDS_TO_WAIT 300
+
 #define CO2_LOW_PAYLOAD_INDEX 0
 #define CO2_HIGH_PAYLOAD_INDEX 1
 #define TEMP_PAYLOAD_INDEX 2
@@ -27,10 +29,8 @@ static TaskHandle_t loraInitTask;
 
 
 // 5 minute delay in ticks + 5s
-static const int IO_DELAY = (954/portTICK_PERIOD_MS)*15;
 
 void lora_timer_callback(TimerHandle_t pxTimer);
-static void _lora_setup();
 
 void initialize_lora_helper(sensor_data_t *sensorData, SemaphoreHandle_t *semaphoreHandle, preferences_t *preferences){
 	privatePreferences=preferences;
@@ -43,7 +43,7 @@ void initialize_lora_helper(sensor_data_t *sensorData, SemaphoreHandle_t *semaph
 	lora_driver_create(ser_USART1);
 
 	vTaskSuspend(ioTaskHandle);
-	loraTimer= xTimerCreate("SENSOR_TIMER", IO_DELAY, pdFALSE, (void *) 0, lora_timer_callback);
+	loraTimer= xTimerCreate("SENSOR_TIMER", ONE_SECOND_SENSOR_TIMER, pdFALSE, (void *) 0, lora_timer_callback);
 	xTimerStart(loraTimer,0);
 }
 
@@ -54,7 +54,7 @@ void handle_message(){
 	lora_setup();
 	while(1){
 		//FIXME IMPLEMENT ME
-		xSemaphoreTake(*privateSemaphore,IO_DELAY);
+		xSemaphoreTake(*privateSemaphore,ONE_SECOND_SENSOR_TIMER);
 		lora_payload_t loraPayload;
 		loraPayload.len=7;
 		// Separating
@@ -75,7 +75,7 @@ void handle_message(){
 		e_LoRa_return_code_t returnCode;
 		if ((returnCode = lora_driver_sent_upload_message(false, &loraPayload)) == LoRa_MAC_TX_OK )
 		{
-			printf("SENSOR_DATA_SEND_OFF %d\n",IO_DELAY);
+			printf("SENSOR_DATA_SEND_OFF\n");
 			// The uplink message is sent and there is no downlink message received
 		}
 		else if (returnCode == LoRa_MAC_RX_OK)
@@ -91,7 +91,7 @@ void handle_message(){
 		privateSensorData->CO2=0;
 		printf("%dc,%dt,%dh,%ds,%dm POST-REMOVE",privateSensorData->CO2,privateSensorData->temperature,privateSensorData->humidity,privateSensorData->light,privateSensorData->movement);
 		xSemaphoreGive(*privateSemaphore);
-		vTaskDelayUntil(&xLastWakeTimeLoraSendOff,IO_DELAY);
+		vTaskDelayUntil(&xLastWakeTimeLoraSendOff,ONE_SECOND_SENSOR_TIMER*LORA_SECONDS_TO_WAIT);
 	}
 	#pragma clang diagnostic pop
 }
@@ -112,20 +112,17 @@ void lora_setup(){
 	vTaskDelay(2);
 	lora_driver_reset_rn2483(0);
 	vTaskDelay(150);
-
 	if (lora_driver_rn2483_factory_reset() != LoRA_OK)
 	{
 		printf("FACTORY_RESET_FAILURE \n");
 	}
 	vTaskDelay(150);
-	printf("CONFIGURE_INIT \n");
+	printf("CONFIGURE_START \n");
+	vTaskDelay(5);
 	if (lora_driver_configure_to_eu868() != LoRA_OK)
 	{
 		printf("CONFIGURE_BREAK \n");
 	}
-	
-	printf("CONFIGURE_INIT_DONE \n");
-
 	static char dev_eui[17]; // It is static to avoid it to occupy stack space in the task
 	if (lora_driver_get_rn2483_hweui(dev_eui) != LoRA_OK)
 	{
@@ -141,14 +138,35 @@ void lora_setup(){
 	{
 		printf("LORA_ACCEPTED \n");
 		}else if(rc==7){
+		printf("LORA_DENIED_STARTING_RETRY\n");
 		for (int i = 0; i < 5; ++i) {
 			rc=lora_driver_join(LoRa_OTAA);
-			if(rc==7){
-				printf("LORA_DENIED\n");
-				continue;
-				}else{
-				printf("LORA_ACCEPTED\n");
-				break;
+			switch(rc){
+				case 7:{
+					printf("LORA_DENIED_ATTEMPT:%i \n",i);
+					continue;
+				}
+				case 8:{
+					printf("LORA_ACCEPTED \n");
+					break;
+				}
+				case 0:{
+					printf("LORA_OK \n");
+					break;
+				}
+				case 3:{
+					printf("LORA_NO_EMPTY_CHANNEL_TERMINATING... \n");
+					vTaskSuspend(NULL);
+					break;
+				}
+				case 1:{
+					printf("LORA_ERROR_ATTEMPT:%i \n",i);
+					continue;
+				}
+				if(i==4){
+					printf("CONNECTION_FAILED_TASK_TERMINATING...\n");
+					vTaskSuspend(NULL);
+				}
 			}
 		}
 	}
