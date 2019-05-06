@@ -26,8 +26,8 @@ static TimerHandle_t loraTimer;
 static TaskHandle_t loraInitTask;
 
 
-// 5 minute delay in ticks + 5s 
-static const int IO_DELAY = (954/portTICK_PERIOD_MS)*305;
+// 5 minute delay in ticks + 5s
+static const int IO_DELAY = (954/portTICK_PERIOD_MS)*15;
 
 void lora_timer_callback(TimerHandle_t pxTimer);
 static void _lora_setup();
@@ -118,11 +118,14 @@ void lora_setup(){
 		printf("FACTORY_RESET_FAILURE \n");
 	}
 	vTaskDelay(150);
-
+	printf("CONFIGURE_INIT \n");
 	if (lora_driver_configure_to_eu868() != LoRA_OK)
 	{
 		printf("CONFIGURE_BREAK \n");
 	}
+	
+	printf("CONFIGURE_INIT_DONE \n");
+
 	static char dev_eui[17]; // It is static to avoid it to occupy stack space in the task
 	if (lora_driver_get_rn2483_hweui(dev_eui) != LoRA_OK)
 	{

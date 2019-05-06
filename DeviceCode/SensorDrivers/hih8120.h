@@ -28,11 +28,6 @@ Here you you will find the functions you will need to work with the driver.
 #ifndef HIH8120_H_
 #define HIH8120_H_
 #include <stdbool.h>
-#include <ATMEGA_FreeRTOS.h>
-#include <stdint-gcc.h>
-#include <stdio.h>
-#include <semphr.h>
-#include <timers.h>
 
 /**
 \ingroup hih8120_driver_return_codes
@@ -137,7 +132,7 @@ uint16_t hih8120GetHumidityPercent_x10(void);
 
 \return Temperature C [x10]
 */
-uint16_t hih8120GetTemperature_x10(void);
+int16_t hih8120GetTemperature_x10(void);
 
 /* ======================================================================================================================= */
 /**
