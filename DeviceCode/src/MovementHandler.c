@@ -28,26 +28,26 @@ void movement_handler_initialize(uint16_t* movement_pointer, SemaphoreHandle_t *
 }
 
 void movement_task(){
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wmissing-noreturn"
 
-    TickType_t xLastWakeTimeMovement=xTaskGetTickCount();
-    while(1){
-        xSemaphoreTake(*private_semaphore,MOVEMENT_SENSOR_TIMER);
-        printf("MOVEMENT TASK \n");
-        if ( hcSr501IsDetecting(hcSr501Inst) )
-        {
-            *private_movement_pointer+=1;
-            printf("MOVEMENT_DETECTED\n");
-            vTaskResume(eventReactorTask);
-            xSemaphoreGive(*private_semaphore);
-            vTaskDelayUntil(&xLastWakeTimeMovement,MOVEMENT_SENSOR_TIMER*10);
-        }
-        else
-        {
-            xSemaphoreGive(*private_semaphore);
-            vTaskDelayUntil(&xLastWakeTimeMovement,MOVEMENT_SENSOR_TIMER*1);
-        }
-    }
-#pragma clang diagnostic pop
+	TickType_t xLastWakeTimeMovement=xTaskGetTickCount();
+	while(1){
+		xSemaphoreTake(*private_semaphore,MOVEMENT_SENSOR_TIMER);
+		printf("MOVEMENT TASK \n");
+		if ( hcSr501IsDetecting(hcSr501Inst) )
+		{
+			*private_movement_pointer+=1;
+			printf("MOVEMENT_DETECTED\n");
+			toggleLights();
+			vTaskDelayUntil(&xLastWakeTimeMovement,MOVEMENT_SENSOR_TIMER*10);
+			xSemaphoreGive(*private_semaphore);
+		}
+		else
+		{
+			xSemaphoreGive(*private_semaphore);
+			vTaskDelayUntil(&xLastWakeTimeMovement,MOVEMENT_SENSOR_TIMER*1);
+		}
+	}
+	#pragma clang diagnostic pop
 }
