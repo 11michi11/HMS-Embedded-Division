@@ -3,12 +3,15 @@ package embedded.BridgeApp.application.websocket;
 import com.google.gson.Gson;
 import embedded.BridgeApp.application.Element;
 import embedded.BridgeApp.persistance.MongoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -17,7 +20,7 @@ import java.util.concurrent.CompletionStage;
 public class LoraClient implements WebSocket.Listener {
 
     private final MongoRepository mongoRepository;
-
+    Logger logger = LoggerFactory.getLogger(LoraClient.class);
     private WebSocket webSocket;
     private Gson gson;
 
@@ -28,12 +31,12 @@ public class LoraClient implements WebSocket.Listener {
 
     public CompletionStage<?> onText​(WebSocket webSocket, CharSequence data, boolean last) {
         webSocket.request(1);
-        System.out.println(data);
-        LoraDownlinkMessage message = gson.fromJson(data.toString(), LoraDownlinkMessage.class);
+        LoraUplinkMessage message = gson.fromJson(data.toString(), LoraUplinkMessage.class);
+        logger.info("Received text from " + message.getEUI() + ", with content: " + message.getData());
         if (message.getCmd().equals("rx")) {
             List<Element> elements = LoraTranslator.translateDataFromDevice(message.getData(), message.getEUI());
-            System.out.println("Translated");
-            elements.forEach(element -> System.out.println(element.toString() + " class: " + element.getClass().getSimpleName()));
+            logger.info("Translated data:");
+            elements.forEach(element -> logger.info(element.toString() + " class: " + element.getClass().getSimpleName()));
             mongoRepository.save(elements);
         }
         return null; // new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
@@ -48,48 +51,45 @@ public class LoraClient implements WebSocket.Listener {
     public void onOpen(WebSocket webSocket) {
         // This WebSocket will invoke onText, onBinary, onPing, onPong or onClose methods on the associated listener (i.e. receive methods) up to n more times
         webSocket.request(1);
-        System.out.println("WebSocket Listener has been opened for requests.");
+        logger.info("WebSocket Listener has been opened for requests.");
         this.webSocket = webSocket;
 
 //
-//        var msg = new LoraDownlinkMessage("tx", "0004A30B0021D2A1", 1, false, "Bon Jovi went out in a Blaze of Glory because they stood behind Chuck Norris when he lit a fart!");
+//        var msg = new LoraUplinkMessage("tx", "0004A30B0021D2A1", 1, false, "Bon Jovi went out in a Blaze of Glory because they stood behind Chuck Norris when he lit a fart!");
 //        var gson = new Gson();
 //        sendText(gson.toJson(msg), false);
     }
 
     public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
-        System.out.println("On binary");
+        logger.info("Received binary message " + Arrays.toString(data.array()));
         webSocket.request(1);
         return null;
     }
 
     public void onError​(WebSocket webSocket, Throwable error) {
-        System.out.println("A " + error.getCause() + " exception was thrown.");
-        System.out.println("Message: " + error.getLocalizedMessage());
+        logger.error("A " + error.getCause() + " exception was thrown.", error);
         webSocket.abort();
     }
 
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-        System.out.println("WebSocket closed!");
-        System.out.println("Status:" + statusCode + " Reason: " + reason);
+        logger.info("WebSocket closed! Status:" + statusCode + " Reason: " + reason);
         return null; //new CompletableFuture().completedFuture("onClose() completed.").thenAccept(System.out::println);
     }
 
     public CompletionStage<?> onPing​(WebSocket webSocket, ByteBuffer message) {
         webSocket.request(1);
-        System.out.println("Ping: Client ---> Server");
-        System.out.println(message.asCharBuffer().toString());
+        logger.info("Ping: Client ---> Server " + message.asCharBuffer().toString());
         return null; // new CompletableFuture().completedFuture("Ping completed.").thenAccept(System.out::println);
     }
 
     public CompletionStage<?> onPong​(WebSocket webSocket, ByteBuffer message) {
         webSocket.request(1);
-        System.out.println("Pong: Client ---> Server");
-        System.out.println(message.asCharBuffer().toString());
+        logger.info("Pong: Client ---> Server " + message.asCharBuffer().toString());
         return null; // new CompletableFuture().completedFuture("Pong completed.").thenAccept(System.out::println);
     }
 
     public CompletableFuture<WebSocket> sendText(CharSequence message, boolean last) {
+        logger.info("Sending text: " + message);
         return webSocket.sendText(message, last);
     }
 }

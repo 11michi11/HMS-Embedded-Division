@@ -18,7 +18,7 @@ public class LoraTranslator {
 
     public static String translateOperationCodeToData(OperationCode code, String deviceID) {
         String data = String.format("%02x", code.getCode());
-        LoraUplinkMessage uplinkMessage = new LoraUplinkMessage(deviceID, data);
+        LoraDownlinkMessage uplinkMessage = new LoraDownlinkMessage(deviceID, data);
         Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithoutExposeAnnotation().create();
         return gson.toJson(uplinkMessage);
     }

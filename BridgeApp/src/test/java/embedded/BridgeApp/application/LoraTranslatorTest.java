@@ -50,7 +50,6 @@ class LoraTranslatorTest {
 
     @Test
     public void testTranslateOffLightOperation() {
-        LoraUplinkMessage.resetFrameCounter();
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_AUTOMATIC_LIGHTS,deviceId);
         String time = data.substring(42,data.indexOf("ack")-2);
         String hexOpCode = "04";
@@ -61,7 +60,6 @@ class LoraTranslatorTest {
 
     @Test
     public void testTranslateOnLightOperation() {
-        LoraUplinkMessage.resetFrameCounter();
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_AUTOMATIC_LIGHTS,deviceId);
         String time = data.substring(42,data.indexOf("ack")-2);
         String hexOpCode = "03";
@@ -72,7 +70,6 @@ class LoraTranslatorTest {
 
     @Test
     public void testTranslateOnBuzzerOperation() {
-        LoraUplinkMessage.resetFrameCounter();
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_BUZZER,deviceId);
         String time = data.substring(42,data.indexOf("ack")-2);
         String hexOpCode = "01";
@@ -83,7 +80,6 @@ class LoraTranslatorTest {
 
     @Test
     public void testTranslateOffBuzzerOperation() {
-        LoraUplinkMessage.resetFrameCounter();
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_BUZZER,deviceId);
         String time = data.substring(42,data.indexOf("ack")-2);
         String hexOpCode = "02";
