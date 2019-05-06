@@ -51,40 +51,32 @@ class LoraTranslatorTest {
     @Test
     public void testTranslateOffLightOperation() {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_AUTOMATIC_LIGHTS,deviceId);
-        String time = data.substring(42,data.indexOf("ack")-2);
         String hexOpCode = "04";
-        String expected = "{\"cmd\":\"rx\",\"EUI\":\"" + deviceId + "\",\"ts\":" + time +
-                ",\"ack\":" + false + ",\"fcnt\":" + 0 + ",\"port\":" + 5555 + ",\"data\":\"" + hexOpCode + "\"}";
+        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":1,\"data\":\""+hexOpCode+"\"}";
         assertEquals(expected,data);
     }
 
     @Test
     public void testTranslateOnLightOperation() {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_AUTOMATIC_LIGHTS,deviceId);
-        String time = data.substring(42,data.indexOf("ack")-2);
         String hexOpCode = "03";
-        String expected = "{\"cmd\":\"rx\",\"EUI\":\"" + deviceId + "\",\"ts\":" + time +
-                ",\"ack\":" + false + ",\"fcnt\":" + 0 + ",\"port\":" + 5555 + ",\"data\":\"" + hexOpCode + "\"}";
+        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":1,\"data\":\""+hexOpCode+"\"}";
         assertEquals(expected,data);
     }
 
     @Test
     public void testTranslateOnBuzzerOperation() {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_BUZZER,deviceId);
-        String time = data.substring(42,data.indexOf("ack")-2);
         String hexOpCode = "01";
-        String expected = "{\"cmd\":\"rx\",\"EUI\":\"" + deviceId + "\",\"ts\":" + time +
-                ",\"ack\":" + false + ",\"fcnt\":" + 0 + ",\"port\":" + 5555 + ",\"data\":\"" + hexOpCode + "\"}";
+        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":1,\"data\":\""+hexOpCode+"\"}";
         assertEquals(expected,data);
     }
 
     @Test
     public void testTranslateOffBuzzerOperation() {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_BUZZER,deviceId);
-        String time = data.substring(42,data.indexOf("ack")-2);
         String hexOpCode = "02";
-        String expected = "{\"cmd\":\"rx\",\"EUI\":\"" + deviceId + "\",\"ts\":" + time +
-                ",\"ack\":" + false + ",\"fcnt\":" + 0 + ",\"port\":" + 5555 + ",\"data\":\"" + hexOpCode + "\"}";
+        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":1,\"data\":\""+hexOpCode+"\"}";
         assertEquals(expected,data);
     }
 

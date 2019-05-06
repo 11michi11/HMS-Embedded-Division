@@ -18,9 +18,9 @@ public class LoraTranslator {
 
     public static String translateOperationCodeToData(OperationCode code, String deviceID) {
         String data = String.format("%02x", code.getCode());
-        LoraDownlinkMessage uplinkMessage = new LoraDownlinkMessage(deviceID, data);
-        Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithoutExposeAnnotation().create();
-        return gson.toJson(uplinkMessage);
+        LoraDownlinkMessage downlinkMessage = new LoraDownlinkMessage(deviceID, data);
+        Gson gson = new Gson();
+        return gson.toJson(downlinkMessage);
     }
 
     private static byte[] hexStringToByteArray(String s) {
