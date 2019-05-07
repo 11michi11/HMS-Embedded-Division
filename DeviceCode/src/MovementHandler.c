@@ -43,7 +43,7 @@ void movement_task(){
 			toggleLights();
             vTaskDelay(ONE_SECOND_SENSOR_TIMER*LIGHT_TURN_ON_TIMER_IN_SECONDS);
             toggleLights();
-			vTaskDelayUntil(&xLastWakeTimeMovement,ONE_SECOND_SENSOR_TIMER*LIGHT_TURN_ON_TIMER_IN_SECONDS);
+			vTaskDelayUntil(&xLastWakeTimeMovement,ONE_SECOND_SENSOR_TIMER*LIGHT_TURN_ON_TIMER_IN_SECONDS+5);
 		}
 		else
 		{
