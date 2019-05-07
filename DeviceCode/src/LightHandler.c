@@ -45,7 +45,6 @@ void light_task(){
 
 void light_callback(tsl2591ReturnCode_t rc){
     uint16_t light;
-    float _lux;
     printf("%i:LIGHT_CALLBACK_RC\n", rc);
     switch (rc) {
         case TSL2591_DATA_READY: {

@@ -24,8 +24,8 @@ void initialize_repository(sensor_data_t *sensorData, SemaphoreHandle_t *semapho
     sensorDataPrivate->temperature=0;
     //--------------------------------------------- TASK AND TIMER SETUP --------------------------------------------------//
     movement_handler_initialize(&sensorDataPrivate->movement,semaphoreHandle);
-    carbon_handler_initialize(&sensorDataPrivate->CO2,semaphoreHandle);
     th_handler_initialize(&sensorDataPrivate->temperature,&sensorDataPrivate->humidity,semaphoreHandle);
+    carbon_handler_initialize(&sensorDataPrivate->CO2,semaphoreHandle);
     light_handler_initialize(&sensorDataPrivate->light,semaphoreHandle);
 }
 

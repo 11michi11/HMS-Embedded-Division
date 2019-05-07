@@ -14,7 +14,6 @@
 
 void carbon_handler_initialize(uint16_t* co2_pointer,SemaphoreHandle_t *semaphoreHandle);
 void co2_task();
-void co2_callback(uint16_t co2_ppm);
 
 
 #endif //DEVICECODE_CARBON_HANDLER_H

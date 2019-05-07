@@ -33,25 +33,20 @@ void th_handler_initialize(uint16_t* temp_pointer,uint16_t* humid_pointer,Semaph
 void th_task(){
     TickType_t xLastWakeTimeTemp=xTaskGetTickCount();
     while(1){
-        //FIXME Ask Ib about the status codes that are returned Measure / WakeUp
         xSemaphoreTake(*private_semaphore,TH_SENSOR_TIMER*120);
         hih8120DriverReturnCode_t rc;
-        printf("HIH_WAKE_UP: ");
-        rc=hih8120Wakeup();
-        printf("%i \n",rc);
-        vTaskDelay(150);
 
-        printf("HIH_MEASURE: ");
+        rc=hih8120Wakeup();
+        printf("HIH_WAKE_UP:%i\n",rc);
+        vTaskDelay(pdMS_TO_TICKS(51));
         rc= hih8120Meassure();
-        printf("%i \n",rc);
-        vTaskDelayUntil(&xLastWakeTimeTemp,pdMS_TO_TICKS(51));
+        printf("HIH_MEASURE:%i\n",rc);
+
 
         *private_temp_pointer+=hih8120GetTemperature_x10()/10;
         *private_humid_pointer+=hih8120GetHumidityPercent_x10()/10;
-
         printf("%i:TEMP:%i:HUMID \n",*private_temp_pointer,*private_humid_pointer);
         printf("%i:TEMP:%i:HUMID \n",hih8120GetTemperature_x10()/10,hih8120GetHumidityPercent_x10()/10);
-        vTaskDelay(150);
         xSemaphoreGive(*private_semaphore);
         vTaskDelayUntil(&xLastWakeTimeTemp,TH_SENSOR_TIMER*60);
     }

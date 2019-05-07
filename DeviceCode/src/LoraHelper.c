@@ -25,10 +25,11 @@ static SemaphoreHandle_t* privateSemaphore;
 static sensor_data_t* privateSensorData;
 static TaskHandle_t ioTaskHandle=NULL;
 static TimerHandle_t loraTimer;
-static TaskHandle_t loraInitTask;
 
 
 // 5 minute delay in ticks + 5s
+
+void lora_setup();
 
 void lora_timer_callback(TimerHandle_t pxTimer);
 
@@ -43,7 +44,7 @@ void initialize_lora_helper(sensor_data_t *sensorData, SemaphoreHandle_t *semaph
 	lora_driver_create(ser_USART1);
 
 	vTaskSuspend(ioTaskHandle);
-	loraTimer= xTimerCreate("SENSOR_TIMER", ONE_SECOND_SENSOR_TIMER, pdFALSE, (void *) 0, lora_timer_callback);
+	loraTimer= xTimerCreate("SENSOR_TIMER", ONE_SECOND_SENSOR_TIMER*LORA_SECONDS_TO_WAIT, pdFALSE, (void *) 0, lora_timer_callback);
 	xTimerStart(loraTimer,0);
 }
 
@@ -80,7 +81,7 @@ void handle_message(){
 		}
 		else if (returnCode == LoRa_MAC_RX_OK)
 		{
-					printf("%d:LORA_READ_OK \n",returnCode);
+		    printf("%d:LORA_READ_OK \n",returnCode);
 			parseMessage();
 		}
 		printf("%d:LORA RETURN CODE \n",returnCode);
@@ -92,7 +93,7 @@ void handle_message(){
 		privateSensorData->CO2=0;
 		printf("%dc,%dt,%dh,%ds,%dm POST-REMOVE \n",privateSensorData->CO2,privateSensorData->temperature,privateSensorData->humidity,privateSensorData->light,privateSensorData->movement);
 		xSemaphoreGive(*privateSemaphore);
-		vTaskDelayUntil(&xLastWakeTimeLoraSendOff,ONE_SECOND_SENSOR_TIMER*LORA_SECONDS_TO_WAIT);
+		vTaskDelayUntil(&xLastWakeTimeLoraSendOff,ONE_SECOND_SENSOR_TIMER*LORA_SECONDS_TO_WAIT+1);
 	}
 	#pragma clang diagnostic pop
 }
@@ -119,7 +120,7 @@ void lora_setup(){
 	}
 	vTaskDelay(150);
 	printf("CONFIGURE_START \n");
-	vTaskDelay(5);
+	vTaskDelay(150);
 	if (lora_driver_configure_to_eu868() != LoRA_OK)
 	{
 		printf("CONFIGURE_BREAK \n");
@@ -149,14 +150,14 @@ void lora_setup(){
 				}
 				case 8:{
 					printf("LORA_ACCEPTED \n");
-					break;
+					return;
 				}
 				case 0:{
 					printf("LORA_OK \n");
-					break;
+                    return;
 				}
 				case 3:{
-					printf("LORA_NO_EMPTY_CHANNEL_TERMINATING... \n");
+					printf("LORA_NO_EMPTY_CHANNEL_TASK_TERMINATING... \n");
 					vTaskSuspend(NULL);
 					break;
 				}
@@ -164,11 +165,11 @@ void lora_setup(){
 					printf("LORA_ERROR_ATTEMPT:%i \n",i);
 					continue;
 				}
-				if(i==4){
-					printf("CONNECTION_FAILED_TASK_TERMINATING...\n");
-					vTaskSuspend(NULL);
-				}
 			}
+            if(i==4){
+                printf("CONNECTION_FAILED_TASK_TERMINATING...\n");
+                vTaskSuspend(NULL);
+            }
 		}
 	}
 }

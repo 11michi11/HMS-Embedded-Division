@@ -13,7 +13,7 @@
 
 typedef struct sensor_data{
     uint16_t CO2;
-    uint16_t temperature;
+    int16_t temperature;
     uint16_t light;
     uint16_t movement;
     uint16_t humidity;

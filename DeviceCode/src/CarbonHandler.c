@@ -17,6 +17,7 @@ static SemaphoreHandle_t* private_semaphore;
 static TaskHandle_t CO2Handle=NULL;
 int const CO2_SENSOR_TIMER=954/portTICK_PERIOD_MS;
 
+void co2_callback(uint16_t co2_ppm);
 
 void carbon_handler_initialize(uint16_t* co2_pointer,SemaphoreHandle_t* semaphoreHandle){
     private_co2_pointer=co2_pointer;
