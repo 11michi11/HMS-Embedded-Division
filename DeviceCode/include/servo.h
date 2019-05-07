@@ -5,5 +5,5 @@
  *  Author: gunda
  */ 
 void initialize_servo_motor(); //Initializes servo motor to OC1A
-void servo_move_to_90(); //Moves servo to 90 degrees
-void servo_move_to_0();//Moves servo to 0 degrees
+void servo_move_to_90(); //Move servo to 90 degrees
+void servo_move_to_0();//Move servo to 0 degrees
