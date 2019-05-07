@@ -1,8 +1,7 @@
 package embedded.BridgeApp.application.websocket;
 
 import com.google.gson.Gson;
-import embedded.BridgeApp.application.Element;
-import embedded.BridgeApp.persistance.MongoRepository;
+import embedded.BridgeApp.application.LoraService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -12,20 +11,18 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 @Component
 public class LoraClient implements WebSocket.Listener {
 
-    private final MongoRepository mongoRepository;
     Logger logger = LoggerFactory.getLogger(LoraClient.class);
+    private LoraService loraService;
     private WebSocket webSocket;
     private Gson gson;
 
-    public LoraClient(MongoRepository mongoRepository) {
-        this.mongoRepository = mongoRepository;
+    public LoraClient() {
         gson = new Gson();
     }
 
@@ -33,12 +30,7 @@ public class LoraClient implements WebSocket.Listener {
         webSocket.request(1);
         LoraUplinkMessage message = gson.fromJson(data.toString(), LoraUplinkMessage.class);
         logger.info("Received text from " + message.getEUI() + ", with content: " + message.getData());
-        if (message.getCmd().equals("rx")) {
-            List<Element> elements = LoraTranslator.translateDataFromDevice(message.getData(), message.getEUI());
-            logger.info("Translated data:");
-            elements.forEach(element -> logger.info(element.toString() + " class: " + element.getClass().getSimpleName()));
-            mongoRepository.save(elements);
-        }
+        loraService.handleMessage(message);
         return null; // new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
     }
 
@@ -49,7 +41,6 @@ public class LoraClient implements WebSocket.Listener {
     }
 
     public void onOpen(WebSocket webSocket) {
-        // This WebSocket will invoke onText, onBinary, onPing, onPong or onClose methods on the associated listener (i.e. receive methods) up to n more times
         webSocket.request(1);
         logger.info("WebSocket Listener has been opened for requests.");
         this.webSocket = webSocket;
@@ -91,6 +82,10 @@ public class LoraClient implements WebSocket.Listener {
     public CompletableFuture<WebSocket> sendText(CharSequence message, boolean last) {
         logger.info("Sending text: " + message);
         return webSocket.sendText(message, last);
+    }
+
+    public void setLoraService(LoraService loraService) {
+        this.loraService = loraService;
     }
 }
 // json from lorawan example
