@@ -10,7 +10,7 @@
 #define LORA_appEUI "40f0e6960ec746d8"
 #define LORA_appKEY "234cc8845c2087ff6a56deb1f9c1d5b4"
 
-#define LORA_SECONDS_TO_WAIT 300
+#define LORA_SECONDS_TO_WAIT 60
 
 #define CO2_LOW_PAYLOAD_INDEX 0
 #define CO2_HIGH_PAYLOAD_INDEX 1
@@ -80,6 +80,7 @@ void handle_message(){
 		}
 		else if (returnCode == LoRa_MAC_RX_OK)
 		{
+					printf("%d:LORA_READ_OK \n",returnCode);
 			parseMessage();
 		}
 		printf("%d:LORA RETURN CODE \n",returnCode);
@@ -89,7 +90,7 @@ void handle_message(){
 		privateSensorData->humidity=0;
 		privateSensorData->temperature=0;
 		privateSensorData->CO2=0;
-		printf("%dc,%dt,%dh,%ds,%dm POST-REMOVE",privateSensorData->CO2,privateSensorData->temperature,privateSensorData->humidity,privateSensorData->light,privateSensorData->movement);
+		printf("%dc,%dt,%dh,%ds,%dm POST-REMOVE \n",privateSensorData->CO2,privateSensorData->temperature,privateSensorData->humidity,privateSensorData->light,privateSensorData->movement);
 		xSemaphoreGive(*privateSemaphore);
 		vTaskDelayUntil(&xLastWakeTimeLoraSendOff,ONE_SECOND_SENSOR_TIMER*LORA_SECONDS_TO_WAIT);
 	}
