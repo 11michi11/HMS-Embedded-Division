@@ -3,6 +3,9 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
+#define CO2_SECONDS_TO_WAIT 60
+
+
 #include "CarbonHandler.h"
 #include "DataRepository.h"
 #include <util/delay.h>
@@ -15,7 +18,6 @@
 static uint16_t* private_co2_pointer;
 static SemaphoreHandle_t* private_semaphore;
 static TaskHandle_t CO2Handle=NULL;
-int const CO2_SENSOR_TIMER=954/portTICK_PERIOD_MS;
 
 void co2_callback(uint16_t co2_ppm);
 
@@ -32,7 +34,7 @@ void carbon_handler_initialize(uint16_t* co2_pointer,SemaphoreHandle_t* semaphor
 void co2_task(){
     TickType_t xLastWakeTimeCO2=xTaskGetTickCount();
     while(1){
-        xSemaphoreTake(*private_semaphore,CO2_SENSOR_TIMER*60);
+        xSemaphoreTake(*private_semaphore,ONE_SECOND_SENSOR_TIMER*CO2_SECONDS_TO_WAIT);
         printf("CO2 TASK %d \n",xLastWakeTimeCO2);
         mh_z19_return_code_t rc;
         rc = mh_z19_take_meassuring();
@@ -41,7 +43,7 @@ void co2_task(){
             printf("CO2_SENSOR_ERROR\n");
         }
         xSemaphoreGive(*private_semaphore);
-        vTaskDelayUntil(&xLastWakeTimeCO2,CO2_SENSOR_TIMER*60);
+        vTaskDelayUntil(&xLastWakeTimeCO2,ONE_SECOND_SENSOR_TIMER*CO2_SECONDS_TO_WAIT);
     }
 }
 
