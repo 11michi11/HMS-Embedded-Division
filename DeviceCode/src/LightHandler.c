@@ -6,10 +6,13 @@
 #include <DataRepository.h>
 #include "LightHandler.h"
 
+#define LIGHT_SECONDS_TO_WAIT 60
+
+
 static uint16_t* private_light_pointer;
 static SemaphoreHandle_t* private_semaphore;
 static TaskHandle_t LightHandle=NULL;
-int const LIGHT_SENSOR_TIMER=954/portTICK_PERIOD_MS;
+
 
 void light_handler_initialize(uint16_t* light_pointer,SemaphoreHandle_t *semaphoreHandle){
         xTaskCreate(light_task, "SOUND_TASK", configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY, &LightHandle);
@@ -26,7 +29,7 @@ void light_task(){
     TickType_t xLastWakeTimeLight=xTaskGetTickCount();
     while(1){
         printf("LIGHT TASK \n");
-        xSemaphoreTake(*private_semaphore,LIGHT_SENSOR_TIMER*60);
+        xSemaphoreTake(*private_semaphore,ONE_SECOND_SENSOR_TIMER*LIGHT_SECONDS_TO_WAIT);
         printf("%i:ENABLE_RC\n",tsl2591Enable());
         vTaskDelay(150);
         tsl2591FetchData();
@@ -34,7 +37,7 @@ void light_task(){
         tsl2591Disable();
         vTaskDelay(150);
         xSemaphoreGive(*private_semaphore);
-        vTaskDelayUntil(&xLastWakeTimeLight,LIGHT_SENSOR_TIMER*60);
+        vTaskDelayUntil(&xLastWakeTimeLight,ONE_SECOND_SENSOR_TIMER*LIGHT_SECONDS_TO_WAIT);
     }
 #pragma clang diagnostic pop
 

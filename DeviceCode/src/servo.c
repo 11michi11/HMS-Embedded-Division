@@ -9,14 +9,12 @@
 #ifndef F_CPU
 #define F_CPU 16000000UL
 #endif
-#include <util/delay.h>
 #include "servo.h"
 
-void initializeServoMotor()
+void initialize_servo_motor()
 {
 	int testFactor=1; //leave servo at min rotation
-	PORTB=0b00100000;
-	DDRB= 0xFF;  //set OC1A to output (among others)
+	DDRB |= 0x20;  //set OC1A to output
 
 	//Initialize Timer/Counter 1
 	//System Clock as source
@@ -30,12 +28,12 @@ void initializeServoMotor()
 	TCCR1A=(1<<COM1A1);//COM1A1 Clear OCnA when match counting up,Set on down
 	TCCR1B=(1<<WGM13)|(1<<CS11);// Phase and Freq correct ICR1=Top
 }
-void moveServoTo0Degrees()
+void servo_move_to_0()
 {
-	OCR1A = 1000;//Leave servo at min rotation
+	OCR1A = 1000;//Set servo at min rotation
 }
-void moveServoTo90degrees()
+void servo_move_to_90()
 {
-	OCR1A = 2000; //leave servo at max rotation
+	OCR1A = 2000; //Set servo at max rotation
 	
 }

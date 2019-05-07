@@ -22,7 +22,7 @@ int main() {
     preferences=(preferences_t*)malloc(sizeof(preferences_t));
     preferences->lightPreference=1;
     semaphoreHandle= xSemaphoreCreateMutex();
-    //initializeEventReactor(preferences);
+    initializeEventReactor(preferences);
     initialize_repository(sensorData, &semaphoreHandle);
 	initialize_lora_helper(sensorData,&semaphoreHandle,preferences);
     vTaskStartScheduler();
