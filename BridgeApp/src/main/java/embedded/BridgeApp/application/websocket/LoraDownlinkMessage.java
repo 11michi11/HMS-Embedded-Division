@@ -14,7 +14,7 @@ public class LoraDownlinkMessage {
     public LoraDownlinkMessage(String deviceID, String data) {
         cmd = "tx";
         EUI = deviceID;
-        port = 1;
+        port = 23;
         this.data = data;
     }
 }

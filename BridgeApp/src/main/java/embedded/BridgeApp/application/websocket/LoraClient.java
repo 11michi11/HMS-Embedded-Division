@@ -30,6 +30,7 @@ public class LoraClient implements WebSocket.Listener {
         webSocket.request(1);
         LoraUplinkMessage message = gson.fromJson(data.toString(), LoraUplinkMessage.class);
         logger.info("Received text from " + message.getEUI() + ", with content: " + message.getData());
+        logger.info("Full message " + message);
         loraService.handleMessage(message);
         return null; // new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
     }
@@ -44,12 +45,10 @@ public class LoraClient implements WebSocket.Listener {
         webSocket.request(1);
         logger.info("WebSocket Listener has been opened for requests.");
         this.webSocket = webSocket;
-
-//
-//        var msg = new LoraUplinkMessage("tx", "0004A30B0021D2A1", 1, false, "Bon Jovi went out in a Blaze of Glory because they stood behind Chuck Norris when he lit a fart!");
-//        var gson = new Gson();
-//        sendText(gson.toJson(msg), false);
+//         Uncomment to send downlink messages every 1min
+//        loraService.runSendingTask();
     }
+
 
     public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
         logger.info("Received binary message " + Arrays.toString(data.array()));
@@ -79,9 +78,9 @@ public class LoraClient implements WebSocket.Listener {
         return null; // new CompletableFuture().completedFuture("Pong completed.").thenAccept(System.out::println);
     }
 
-    public CompletableFuture<WebSocket> sendText(CharSequence message, boolean last) {
+    public CompletableFuture<WebSocket> sendText(CharSequence message) {
         logger.info("Sending text: " + message);
-        return webSocket.sendText(message, last);
+        return webSocket.sendText(message,true);
     }
 
     public void setLoraService(LoraService loraService) {

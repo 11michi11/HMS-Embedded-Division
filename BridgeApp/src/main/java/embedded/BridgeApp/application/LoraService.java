@@ -1,9 +1,7 @@
 package embedded.BridgeApp.application;
 
-import embedded.BridgeApp.application.websocket.LoraClient;
-import embedded.BridgeApp.application.websocket.LoraTranslator;
-import embedded.BridgeApp.application.websocket.LoraUplinkMessage;
-import embedded.BridgeApp.application.websocket.OperationCode;
+import com.google.gson.Gson;
+import embedded.BridgeApp.application.websocket.*;
 import embedded.BridgeApp.persistance.MongoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,26 +39,46 @@ public class LoraService implements LightsControl, BuzzerControl {
     @Override
     public void turnOnBuzzer(String deviceID) {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_BUZZER, deviceID);
-        loraClient.sendText(data, false);
+        loraClient.sendText(data);
     }
 
     @Override
     public void turnOffBuzzer(String deviceID) {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_BUZZER, deviceID);
-        loraClient.sendText(data, false);
+        loraClient.sendText(data);
     }
 
     @Override
     public void turnOnMovementDetection(String deviceID) {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_AUTOMATIC_LIGHTS, deviceID);
-        loraClient.sendText(data, false);
+        loraClient.sendText(data);
     }
 
     @Override
     public void turnOffMovementDetection(String deviceID) {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_AUTOMATIC_LIGHTS, deviceID);
-        loraClient.sendText(data, false);
+        loraClient.sendText(data);
     }
+
+
+    public void runSendingTask(){
+        var gson = new Gson();
+        new Thread(()->{
+            while(true){
+                var msg1 = new LoraDownlinkMessage("0004A30B0021D2A1", "48656c6c6f");
+                var msg2 = new LoraDownlinkMessage("0004A30B00259F36", "48656c6c6f");
+                loraClient.sendText(gson.toJson(msg1));
+                loraClient.sendText(gson.toJson(msg2));
+                logger.info("Downlink message has been sent to 0004A30B0021D2A1 and 0004A30B00259F36, content: Hello");
+                try {
+                    Thread.sleep(1000*60);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
 }
 
 
