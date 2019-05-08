@@ -26,7 +26,9 @@ void th_handler_initialize(uint16_t* temp_pointer,uint16_t* humid_pointer,Semaph
     if ( HIH8120_OK == hih8120Create() )
     {
         printf("TEMP_HUMIDITY_INITIALIZED \n");
-    }
+    } else{
+		printf("DRIVER_COULD_NOT_BE_INITIALIZED_TASK_TERMINATING...\n");
+	}
     //--------------------------------------------- TEMP_HUMIDITY SENSOR SETUP --------------------------------------------------//
 }
 
@@ -37,10 +39,30 @@ void th_task(){
         hih8120DriverReturnCode_t rc;
 
         rc=hih8120Wakeup();
-        printf("HIH_WAKE_UP:%i\n",rc);
-        vTaskDelay(pdMS_TO_TICKS(51));
-        rc= hih8120Meassure();
-        printf("HIH_MEASURE:%i\n",rc);
+		printf("HIH_WAKE_UP:%i\n",rc);
+		switch(rc){
+			case 0:{
+				vTaskDelay(pdMS_TO_TICKS(51));
+				rc= hih8120Meassure();
+			    printf("HIH_MEASURE:%i\n",rc);
+				break;
+			}
+			case 3:{
+				vTaskDelay(pdMS_TO_TICKS(100));
+				rc=hih8120Wakeup();
+				vTaskDelay(pdMS_TO_TICKS(51));
+				rc= hih8120Meassure();
+				break;
+			}
+			default:{
+				printf("ERROR_OCCURED_TH_TASK_TERMINATING... \n");
+				xSemaphoreGive(*private_semaphore); 
+				vTaskSuspend(NULL);
+				break;
+				
+			}
+		}
+       
 
 
         *private_temp_pointer+=hih8120GetTemperature_x10()/10;
