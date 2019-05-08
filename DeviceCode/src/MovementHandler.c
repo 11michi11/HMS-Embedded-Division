@@ -20,7 +20,7 @@ void movement_handler_initialize(uint16_t* movement_pointer, SemaphoreHandle_t *
       private_movement_pointer=movement_pointer;
     //--------------------------------------------- MOVEMENT SENSOR SETUP --------------------------------------------------//
         hcSr501Inst = hcSr501Create(&PORTE, PE5);
-        if ( NULL != hcSr501Inst )
+		if ( NULL != hcSr501Inst )
         {
             printf("MOVEMENT_DRIVER_INITIALIZED \n");
         }
@@ -35,6 +35,11 @@ void movement_task(){
 	while(1){
 		xSemaphoreTake(*private_semaphore,ONE_SECOND_SENSOR_TIMER);
 		printf("MOVEMENT TASK \n");
+		if(hcSr501Inst==NULL){
+		    printf("MOVEMENT_SENSOR_NOT_INITIALIZED_TASK_TERMINATING...\n");
+			xSemaphoreGive(*private_semaphore);
+			vTaskSuspend(NULL);
+		}
 		if ( hcSr501IsDetecting(hcSr501Inst) )
 		{
 			*private_movement_pointer+=1;
