@@ -27,8 +27,8 @@ void carbon_handler_initialize(uint16_t* co2_pointer,SemaphoreHandle_t* semaphor
     xTaskCreate(co2_task, "CO2_TASK",
             configMINIMAL_STACK_SIZE, NULL, REGULAR_SENSOR_TASK_PRIORITY,&CO2Handle);
     //--------------------------------------------- CO_2 SENSOR SETUP --------------------------------------------------//
-    mh_z19_create(ser_USART3, co2_callback);
-    //--------------------------------------------- CO_2 SENSOR SETUP --------------------------------------------------//
+	mh_z19_create(ser_USART3,co2_callback);
+	//--------------------------------------------- CO_2 SENSOR SETUP --------------------------------------------------//
 }
 
 void co2_task(){
@@ -37,11 +37,22 @@ void co2_task(){
         xSemaphoreTake(*private_semaphore,ONE_SECOND_SENSOR_TIMER*CO2_SECONDS_TO_WAIT);
         printf("CO2 TASK %d \n",xLastWakeTimeCO2);
         mh_z19_return_code_t rc;
-        rc = mh_z19_take_meassuring();
-        if (rc != 0)
-        {
-            printf("CO2_SENSOR_ERROR\n");
-        }
+		rc = mh_z19_take_meassuring();
+		switch(rc){
+			case 1:
+			{
+			 printf("SENSOR_DATA_NOT_AVAILABLE_PERFORMING_MEASUREMENT...\n");
+			 rc = mh_z19_take_meassuring();
+			 break;
+			}
+			case 2:
+			{
+			 printf("SENSOR_SERIAL_NOT_INITIALIZED_TASK_TERMINATING...\n");
+			xSemaphoreGive(*private_semaphore); 
+			 vTaskSuspend(NULL);
+			 break;
+			}
+		}
         xSemaphoreGive(*private_semaphore);
         vTaskDelayUntil(&xLastWakeTimeCO2,ONE_SECOND_SENSOR_TIMER*CO2_SECONDS_TO_WAIT);
     }
