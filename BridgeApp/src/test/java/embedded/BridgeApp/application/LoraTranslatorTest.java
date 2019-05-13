@@ -52,7 +52,7 @@ class LoraTranslatorTest {
     public void testTranslateOffLightOperation() {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_AUTOMATIC_LIGHTS,deviceId);
         String hexOpCode = "04";
-        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":1,\"data\":\""+hexOpCode+"\"}";
+        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":23,\"data\":\""+hexOpCode+"\"}";
         assertEquals(expected,data);
     }
 
@@ -60,7 +60,7 @@ class LoraTranslatorTest {
     public void testTranslateOnLightOperation() {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_AUTOMATIC_LIGHTS,deviceId);
         String hexOpCode = "03";
-        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":1,\"data\":\""+hexOpCode+"\"}";
+        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":23,\"data\":\""+hexOpCode+"\"}";
         assertEquals(expected,data);
     }
 
@@ -68,7 +68,7 @@ class LoraTranslatorTest {
     public void testTranslateOnBuzzerOperation() {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_ON_BUZZER,deviceId);
         String hexOpCode = "01";
-        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":1,\"data\":\""+hexOpCode+"\"}";
+        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":23,\"data\":\""+hexOpCode+"\"}";
         assertEquals(expected,data);
     }
 
@@ -76,7 +76,7 @@ class LoraTranslatorTest {
     public void testTranslateOffBuzzerOperation() {
         String data = LoraTranslator.translateOperationCodeToData(OperationCode.TURN_OFF_BUZZER,deviceId);
         String hexOpCode = "02";
-        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":1,\"data\":\""+hexOpCode+"\"}";
+        String expected = "{\"cmd\":\"tx\",\"EUI\":\""+deviceId+"\",\"port\":23,\"data\":\""+hexOpCode+"\"}";
         assertEquals(expected,data);
     }
 
