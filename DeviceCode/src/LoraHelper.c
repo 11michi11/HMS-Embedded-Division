@@ -10,7 +10,7 @@
 #define LORA_appEUI "40f0e6960ec746d8"
 #define LORA_appKEY "234cc8845c2087ff6a56deb1f9c1d5b4"
 
-#define LORA_SECONDS_TO_WAIT 60
+#define LORA_SECONDS_TO_WAIT 300
 
 #define CO2_LOW_PAYLOAD_INDEX 0
 #define CO2_HIGH_PAYLOAD_INDEX 1
@@ -116,24 +116,28 @@ void lora_setup(){
 	vTaskDelay(150);
 	if (lora_driver_rn2483_factory_reset() != LoRA_OK)
 	{
-		printf("FACTORY_RESET_FAILURE \n");
+		printf("FACTORY_RESET_FAILURE_TASK_TERMINATING... \n");
+		vTaskSuspend(NULL);
 	}
 	vTaskDelay(150);
-	printf("CONFIGURE_START \n");
+	printf("CONFIGURE_START... \n");
 	vTaskDelay(150);
 	if (lora_driver_configure_to_eu868() != LoRA_OK)
 	{
-		printf("CONFIGURE_BREAK \n");
+		printf("CONFIGURE_BREAK_TASK_TERMINATING... \n");
+		vTaskSuspend(NULL);
 	}
 	static char dev_eui[17]; // It is static to avoid it to occupy stack space in the task
 	if (lora_driver_get_rn2483_hweui(dev_eui) != LoRA_OK)
 	{
-		printf("HWUI_ERROR \n");
+		printf("HWEUI_ERROR_TASK_TERMINATING... \n");
+		vTaskSuspend(NULL);
 	}	else printf("%s, DEV_EUI \n",dev_eui);
 
 	if (lora_driver_set_otaa_identity(LORA_appEUI,LORA_appKEY,dev_eui) != LoRA_OK)
 	{
-		printf("IDENTITY_BREAK \n");
+		printf("IDENTITY_BREAK_TASK_TERMINATING... \n");
+		vTaskSuspend(NULL);
 	}
 	e_LoRa_return_code_t rc;
 	if ((rc=lora_driver_join(LoRa_OTAA)) == LoRa_ACCEPTED)

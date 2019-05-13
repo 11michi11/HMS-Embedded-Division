@@ -30,7 +30,11 @@ void light_task(){
     while(1){
         printf("LIGHT TASK \n");
         xSemaphoreTake(*private_semaphore,ONE_SECOND_SENSOR_TIMER*LIGHT_SECONDS_TO_WAIT);
-        printf("%i:ENABLE_RC\n",tsl2591Enable());
+        if(tsl2591Enable()==7){
+            printf("LIGHT_DRIVER_NOT_INITIALIZED_TASK_TERMINATING...\n");
+			xSemaphoreGive(*private_semaphore);
+            vTaskSuspend(NULL);
+        }
         vTaskDelay(150);
         tsl2591FetchData();
         vTaskDelay(150);
@@ -55,7 +59,9 @@ void light_callback(tsl2591ReturnCode_t rc){
             }
             break;
         }
-        default:{
+        case TSL2591_BUSY:{
+            vTaskDelay(pdMS_TO_TICKS(100));
+            tsl2591FetchData();
             break;
         }
     }

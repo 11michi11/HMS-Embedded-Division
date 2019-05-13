@@ -16,6 +16,5 @@ typedef struct preferences{
 }preferences_t;
 
 void toggleLights();
-void toggleBuzzer();
 void initializeEventReactor(preferences_t* preferences);
 #endif //SEP4_DEVICE_CODE_EVENTREACTOR_H
