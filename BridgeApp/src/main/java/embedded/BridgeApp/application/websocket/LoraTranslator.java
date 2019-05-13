@@ -4,14 +4,19 @@ import com.google.gson.Gson;
 import embedded.BridgeApp.application.Element;
 import embedded.BridgeApp.application.data.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class LoraTranslator {
 
-    public static List<Element> translateDataFromDevice(String data, String eui) {
+    public static List<Element> translateDataFromDevice(String data, String eui, long timestamp) {
         byte[] dataArray = hexStringToByteArray(data);
-        return loadData(dataArray, eui);
+        Instant instant = Instant.ofEpochSecond(timestamp);
+        LocalDateTime currentTime = LocalDateTime.ofInstant(instant, ZoneId.of("CET"));
+        return loadData(dataArray, eui, currentTime);
     }
 
     public static String translateOperationCodeToData(OperationCode code, String deviceID) {
@@ -31,8 +36,7 @@ public class LoraTranslator {
         return data;
     }
 
-    private static List<Element> loadData(byte[] dataArray, String deviceId) {
-        LocalDateTime currentTime = LocalDateTime.now();
+    private static List<Element> loadData(byte[] dataArray, String deviceId, LocalDateTime currentTime) {
         return List.of(
                 new CarbonDioxideData(currentTime, ((dataArray[1] & 0xff) << 8) | (dataArray[0] & 0xff), deviceId),
                 new TemperatureData(currentTime, dataArray[2], deviceId),
