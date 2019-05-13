@@ -21,7 +21,7 @@ class LoraTranslatorTest {
         double[] values = {80,58,92,0,30};
         String data = "50003a5c001e";
         long timestamp = 1L;
-        List<Element> list = LoraTranslator.translateDataFromDevice(data,deviceId, timestamp);
+        List<Element> list = LoraTranslator.translateDataFromDevice(data,deviceId);
 
         for (int i = 0; i<values.length;i++) {
             assertEquals(values[i],((Data) list.get(i)).getValue());
@@ -38,7 +38,7 @@ class LoraTranslatorTest {
         double[] values = {789,58,92,10,30};
         String data = "15033a5c0a1e";
         long timestamp = 1L;
-        List<Element> list = LoraTranslator.translateDataFromDevice(data,deviceId, timestamp);
+        List<Element> list = LoraTranslator.translateDataFromDevice(data,deviceId);
 
         for (int i = 0; i<values.length;i++) {
             assertEquals(values[i],((Data) list.get(i)).getValue());

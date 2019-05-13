@@ -4,15 +4,12 @@ import com.google.gson.Gson;
 import embedded.BridgeApp.application.Element;
 import embedded.BridgeApp.application.data.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 public class LoraTranslator {
 
-    public static List<Element> translateDataFromDevice(String data, String eui, long timestamp) {
+    public static List<Element> translateDataFromDevice(String data, String eui) {
         byte[] dataArray = hexStringToByteArray(data);
         LocalDateTime currentTime = LocalDateTime.now();
         currentTime = currentTime.plusHours(2); // Adjust the timezone

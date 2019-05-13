@@ -29,7 +29,7 @@ public class LoraService implements LightsControl, BuzzerControl {
 
     public void handleMessage(LoraUplinkMessage message){
         if (message.getCmd().equals("rx")) {
-            List<Element> elements = LoraTranslator.translateDataFromDevice(message.getData(), message.getEUI(), message.getTimeInMillis());
+            List<Element> elements = LoraTranslator.translateDataFromDevice(message.getData(), message.getEUI());
             logger.info("Translated data:");
             elements.forEach(element -> logger.info(element.toString() + " class: " + element.getClass().getSimpleName()));
             mongoRepository.save(elements);
