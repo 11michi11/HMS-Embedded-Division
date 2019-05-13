@@ -15,7 +15,7 @@ public class LoraTranslator {
     public static List<Element> translateDataFromDevice(String data, String eui, long timestamp) {
         byte[] dataArray = hexStringToByteArray(data);
         Instant instant = Instant.ofEpochSecond(timestamp);
-        LocalDateTime currentTime = LocalDateTime.ofInstant(instant, ZoneId.of("CET"));
+        LocalDateTime currentTime = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/Copenhagen"));
         return loadData(dataArray, eui, currentTime);
     }
 
