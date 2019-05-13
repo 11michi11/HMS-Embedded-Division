@@ -10,7 +10,7 @@
 #define LORA_appEUI "40f0e6960ec746d8"
 #define LORA_appKEY "234cc8845c2087ff6a56deb1f9c1d5b4"
 
-#define LORA_SECONDS_TO_WAIT 
+#define LORA_SECONDS_TO_WAIT 300
 
 #define CO2_LOW_PAYLOAD_INDEX 0
 #define CO2_HIGH_PAYLOAD_INDEX 1
@@ -41,7 +41,7 @@ void initialize_lora_helper(sensor_data_t *sensorData, SemaphoreHandle_t *semaph
 	xTaskCreate(handle_message, "MESSAGE_HANDLE", configMINIMAL_STACK_SIZE, NULL, LORA_IO_TASK_PRIORITY, &ioTaskHandle);
 
 	hal_create(LORA_INIT_TASK_PRIORITY+1);
-	//lora_driver_create(ser_USART1);
+	lora_driver_create(ser_USART1);
 
 	vTaskSuspend(ioTaskHandle);
 	loraTimer= xTimerCreate("SENSOR_TIMER", ONE_SECOND_SENSOR_TIMER*LORA_SECONDS_TO_WAIT, pdFALSE, (void *) 0, lora_timer_callback);
