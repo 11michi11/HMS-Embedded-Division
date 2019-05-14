@@ -70,9 +70,9 @@ void handle_message(){
 		loraPayload.bytes[CO2_HIGH_PAYLOAD_INDEX]=msb;
 		loraPayload.bytes[TEMP_PAYLOAD_INDEX]=privateSensorData->temperature/5;
 		loraPayload.bytes[HUMIDITY_PAYLOAD_INDEX]=privateSensorData->humidity/5;
-		loraPayload.bytes[MOVEMENT_PAYLOAD_INDEX]=privateSensorData->movement/5;
+		loraPayload.bytes[MOVEMENT_PAYLOAD_INDEX]=privateSensorData->movement;
 		loraPayload.bytes[LIGHT_PAYLOAD_INDEX]=privateSensorData->light/5;
-		printf("%dc,%dt,%dh,%ds,%dm PRE-REMOVE \n",privateSensorData->CO2/5,privateSensorData->temperature/5,privateSensorData->humidity/5,privateSensorData->light/5,privateSensorData->movement/5);
+		printf("%dc,%dt,%dh,%ds,%dm PRE-REMOVE \n",privateSensorData->CO2/5,privateSensorData->temperature/5,privateSensorData->humidity/5,privateSensorData->light/5,privateSensorData->movement);
 		e_LoRa_return_code_t returnCode;
 		if ((returnCode = lora_driver_sent_upload_message(false, &loraPayload)) == LoRa_MAC_TX_OK )
 		{
